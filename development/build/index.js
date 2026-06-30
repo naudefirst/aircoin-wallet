@@ -280,7 +280,6 @@ async function defineAndRunBuildTasks() {
         staticTasks.prod,
         manifestTasks.scriptDist,
       ),
-      zip,
     ),
   );
 
@@ -291,7 +290,6 @@ async function defineAndRunBuildTasks() {
       clean,
       styleTasks.prod,
       composeParallel(scriptTasks.prod, staticTasks.prod, manifestTasks.prod),
-      zip,
     ),
   );
 

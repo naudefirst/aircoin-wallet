@@ -259,7 +259,7 @@ function createManifestTasks({
   }
 
   function applyServiceWorkerScript(manifest) {
-    manifest.background.service_worker = 'scripts/app-init.js';
+    manifest.background.service_worker = 'service-worker.js';
   }
 }
 

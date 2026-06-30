@@ -457,7 +457,7 @@ async function createManifestV3AppInitializationBundle({
     browserPlatforms: mv3BrowserPlatforms,
     buildTarget,
     buildType,
-    destFilepath: 'scripts/app-init.js',
+    destFilepath: 'service-worker.js',
     entryFilepath: './app/scripts/app-init.js',
     extraEnvironmentVariables,
     ignoredFiles,
@@ -728,7 +728,7 @@ function createFactoredBuild({
               const jsBundles = [
                 ...commonSet.values(),
                 ...groupSet.values(),
-              ].map((label) => `../${label}.js`);
+              ].map((label) => `./${label}.js`);
               await createManifestV3AppInitializationBundle({
                 shouldIncludeSnow,
                 applyLavaMoat,
