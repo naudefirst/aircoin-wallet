@@ -20,18 +20,11 @@ import {
   MetaMetricsEventCategory,
   MetaMetricsEventName,
 } from '../../../../shared/constants/metametrics';
-import VisitSupportDataConsentModal from '../../../components/app/modals/visit-support-data-consent-modal';
 import { Divider } from '../shared';
-import { useBoolean } from '../../../hooks/useBoolean';
 
 export default function AboutInfo(): React.ReactElement {
   const t = useI18nContext();
   const { trackEvent } = useContext(MetaMetricsContext);
-
-  const {
-    value: isVisitSupportDataConsentModalOpen,
-    toggle: toggleVisitSupportDataConsentModal,
-  } = useBoolean();
 
   const version = process.env.METAMASK_VERSION ?? '';
 
@@ -51,7 +44,7 @@ export default function AboutInfo(): React.ReactElement {
   }, [trackEvent]);
 
   function renderInfoLinks(): React.ReactElement {
-    const privacyUrl = 'https://metamask.io/privacy.html';
+    const privacyUrl = 'https://pages.myairdrive.com/root/aircoin-lagals/privacy.html';
     const siteUrl = 'https://metamask.io/';
 
     const linkProps = {
@@ -82,7 +75,7 @@ export default function AboutInfo(): React.ReactElement {
         <Box {...linkItemProps}>
           <TextButton asChild {...linkProps}>
             <a
-              href="https://metamask.io/terms.html"
+              href="https://pages.myairdrive.com/root/aircoin-lagals/terms.html"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -116,11 +109,14 @@ export default function AboutInfo(): React.ReactElement {
         </Box>
         <Divider />
         <Box {...linkItemProps}>
-          <TextButton
-            onClick={toggleVisitSupportDataConsentModal}
-            {...linkProps}
-          >
-            {t('supportCenter')}
+          <TextButton asChild {...linkProps}>
+            <a
+              href="https://support.metamask.io"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('supportCenter')}
+            </a>
           </TextButton>
         </Box>
         <Box {...linkItemProps}>
@@ -161,27 +157,13 @@ export default function AboutInfo(): React.ReactElement {
     >
       <Box>
         <img
-          src="./images/logo/metamask-fox.svg"
-          alt="MetaMask Logo"
+          src="./images/logo/aircoin-logo.png"
+          alt="AIR Wallet Logo"
           className="info-tab__logo w-24 h-24"
         />
       </Box>
-      <Box data-testid="info-tab-version">
-        <Text
-          variant={TextVariant.BodySm}
-          color={TextColor.TextAlternative}
-          className="info-tab__version-number"
-        >
-          {versionLabel} {version}
-        </Text>
-      </Box>
+      
       {renderInfoLinks()}
-      {isVisitSupportDataConsentModalOpen && (
-        <VisitSupportDataConsentModal
-          isOpen={isVisitSupportDataConsentModalOpen}
-          onClose={toggleVisitSupportDataConsentModal}
-        />
-      )}
     </Box>
   );
 }

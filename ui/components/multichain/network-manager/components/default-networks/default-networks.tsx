@@ -2,14 +2,8 @@ import { CaipChainId, Hex } from '@metamask/utils';
 import React, { memo, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BtcScope, EthScope, SolScope, TrxScope } from '@metamask/keyring-api';
-import { AddNetworkFields } from '@metamask/network-controller';
-import {
-  CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP,
-  FEATURED_RPCS,
-} from '../../../../../../shared/constants/network';
 import {
   convertCaipToHexChainId,
-  getFilteredFeaturedNetworks,
   getNetworkIcon,
   getRpcDataByChainId,
   sortNetworks,
@@ -17,10 +11,8 @@ import {
 import {
   AlignItems,
   BlockSize,
-  BorderRadius,
   Display,
   FlexDirection,
-  IconColor,
   JustifyContent,
   TextColor,
   TextVariant,
@@ -31,22 +23,16 @@ import {
   setActiveNetwork,
 } from '../../../../../store/actions';
 import {
-  AvatarNetwork,
   AvatarNetworkSize,
   Box,
-  ButtonIcon,
-  ButtonIconSize,
   IconName,
   IconSize,
-  SuccessPill,
   Text,
 } from '../../../../component-library';
 import { NetworkListItem } from '../../../network-list-item';
-import { useAdditionalNetworkHandlers } from '../../hooks/useAdditionalNetworkHandlers';
 import { useNetworkChangeHandlers } from '../../hooks/useNetworkChangeHandlers';
 import { useNetworkItemCallbacks } from '../../hooks/useNetworkItemCallbacks';
 import { useNetworkManagerState } from '../../hooks/useNetworkManagerState';
-import { AdditionalNetworksInfo } from '../additional-networks-info';
 import { getMultichainIsEvm } from '../../../../../selectors/multichain';
 import {
   getAllEnabledNetworksForAllNamespaces,
@@ -59,67 +45,8 @@ import {
   getUseExternalServices,
 } from '../../../../../selectors';
 import { getInternalAccountBySelectedAccountGroupAndCaip } from '../../../../../selectors/multichain-accounts/account-tree';
-import { selectAdditionalNetworksBlacklistFeatureFlag } from '../../../../../selectors/network-blacklist/network-blacklist';
 import { isEvmChainId } from '../../../../../../shared/lib/asset-utils';
-import { useIsNetworkGasSponsored } from '../../../../../hooks/useIsNetworkGasSponsored';
-
-const AdditionalNetwork = ({ network }: { network: AddNetworkFields }) => {
-  const t = useI18nContext();
-  const networkImageUrl =
-    CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP[
-      network.chainId as keyof typeof CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP
-    ];
-
-  // Use the additional network handlers hook
-  const { handleAdditionalNetworkClick } = useAdditionalNetworkHandlers();
-  const { isNetworkGasSponsored } = useIsNetworkGasSponsored(network.chainId);
-
-  return (
-    <Box
-      display={Display.Flex}
-      alignItems={AlignItems.center}
-      justifyContent={JustifyContent.flexStart}
-      width={BlockSize.Full}
-      onClick={() => handleAdditionalNetworkClick(network)}
-      paddingLeft={4}
-      paddingRight={4}
-      paddingTop={4}
-      paddingBottom={4}
-      gap={4}
-      data-testid="additional-network-item"
-      className="network-manager__additional-network-item"
-      key={network.chainId}
-    >
-      <AvatarNetwork
-        name={network.name}
-        size={AvatarNetworkSize.Md}
-        src={networkImageUrl}
-        borderRadius={BorderRadius.LG}
-      />
-      <Box
-        display={Display.Flex}
-        flexDirection={FlexDirection.Row}
-        alignItems={AlignItems.center}
-        gap={2}
-      >
-        <Text variant={TextVariant.bodyMdMedium} color={TextColor.textDefault}>
-          {network.name}
-        </Text>
-        {isNetworkGasSponsored && (
-          <SuccessPill label={t('noNetworkFee')} display={Display.InlineFlex} />
-        )}
-      </Box>
-      <ButtonIcon
-        size={ButtonIconSize.Md}
-        color={IconColor.iconDefault}
-        iconName={IconName.Add}
-        padding={0}
-        marginLeft={'auto'}
-        ariaLabel={t('addNetwork')}
-      />
-    </Box>
-  );
-};
+import { CHAIN_IDS } from '../../../../../../shared/constants/network';
 
 const DefaultNetworks = memo(() => {
   const t = useI18nContext();
@@ -166,11 +93,6 @@ const DefaultNetworks = memo(() => {
     getInternalAccountBySelectedAccountGroupAndCaip(state, TrxScope.Mainnet),
   );
 
-  // Get blacklisted chain IDs from feature flag
-  const blacklistedChainIds = useSelector(
-    selectAdditionalNetworksBlacklistFeatureFlag,
-  );
-
   // Use the shared state hook
   const { nonTestNetworks, isNetworkInDefaultNetworkTab } =
     useNetworkManagerState({ showDefaultNetworks: true });
@@ -188,37 +110,22 @@ const DefaultNetworks = memo(() => {
               network.chainId === selectedNonEvmChainId,
           ),
         );
-    return sortNetworks(filteredNetworks, orderedNetworksList);
+    const sorted = sortNetworks(filteredNetworks, orderedNetworksList);
+    // Pin AirCoin to the top of the default networks list
+    const aircoinIndex = sorted.findIndex(
+      (n) => convertCaipToHexChainId(n.chainId) === CHAIN_IDS.AIRCOIN,
+    );
+    if (aircoinIndex > 0) {
+      const [aircoin] = sorted.splice(aircoinIndex, 1);
+      sorted.unshift(aircoin);
+    }
+    return sorted;
   }, [
     nonTestNetworks,
     orderedNetworksList,
     useExternalServices,
     selectedNonEvmChainId,
   ]);
-
-  // Memoize the featured networks calculation
-  const featuredNetworksNotYetEnabled = useMemo(() => {
-    // Filter out networks that are already enabled
-    const availableNetworks = FEATURED_RPCS.filter(
-      ({ chainId }) => !evmNetworks[chainId],
-    );
-
-    // Apply basic functionality toggle filter to exclude non-EVM networks when BFT is OFF
-    const bftFilteredNetworks = useExternalServices
-      ? availableNetworks
-      : availableNetworks.filter(({ chainId }) =>
-          isEvmChainId(chainId as `0x${string}`),
-        );
-
-    // Apply blacklist filter to exclude blacklisted networks
-    const filteredNetworks = getFilteredFeaturedNetworks(
-      blacklistedChainIds,
-      bftFilteredNetworks,
-    );
-
-    // Sort alphabetically
-    return filteredNetworks.sort((a, b) => a.name.localeCompare(b.name));
-  }, [evmNetworks, blacklistedChainIds, useExternalServices]);
 
   const isAllPopularNetworksSelected = useMemo(
     () => allEnabledNetworksForAllNamespaces.length > 1,
@@ -368,16 +275,6 @@ const DefaultNetworks = memo(() => {
     selectedNonEvmChainId,
   ]);
 
-  // Memoize the additional network list items
-  const additionalNetworkListItems = useMemo(() => {
-    return featuredNetworksNotYetEnabled.map((network) => (
-      <AdditionalNetwork
-        key={`additionnal-network-${network.chainId}`}
-        network={network}
-      ></AdditionalNetwork>
-    ));
-  }, [featuredNetworksNotYetEnabled]);
-
   return (
     <>
       <Box display={Display.Flex} flexDirection={FlexDirection.Column}>
@@ -395,10 +292,6 @@ const DefaultNetworks = memo(() => {
           />
         </Box>
         {networkListItems}
-        <>
-          <AdditionalNetworksInfo />
-          {additionalNetworkListItems}
-        </>
       </Box>
     </>
   );

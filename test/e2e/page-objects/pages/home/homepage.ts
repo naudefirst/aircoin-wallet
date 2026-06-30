@@ -74,7 +74,7 @@ class HomePage {
     '[data-testid="coin-overview-balance-empty-state"]';
 
   private readonly fundYourWalletBanner = {
-    text: 'Fund your wallet',
+    text: 'Fund your Air Wallet',
   };
 
   private readonly loadingOverlay = {

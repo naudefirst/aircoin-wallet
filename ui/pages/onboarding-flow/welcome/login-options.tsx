@@ -201,7 +201,7 @@ export default function LoginOptions({
             asChild
           >
             <a
-              href="https://consensys.io/terms-of-use"
+              phref="https://pages.myairdrive.com/root/aircoin-lagals/terms.html"
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${t('onboardingLoginFooterTermsOfUse')} (${t(
@@ -217,7 +217,7 @@ export default function LoginOptions({
             asChild
           >
             <a
-              href="https://consensys.io/privacy-notice"
+              href="https://pages.myairdrive.com/root/aircoin-lagals/privacy.html"
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${t('onboardingLoginFooterPrivacyNotice')} (${t(

@@ -214,7 +214,7 @@ describe('TransactionActivityEmptyState', () => {
     const image = screen.getByAltText('Activity');
     expect(image).toHaveAttribute(
       'src',
-      './images/empty-state-activity-light.png',
+      './images/magnify.png',
     );
   });
 

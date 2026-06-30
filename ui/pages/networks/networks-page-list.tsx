@@ -1,67 +1,32 @@
 import {
-  type AddNetworkFields,
-  type NetworkConfiguration,
-} from '@metamask/network-controller';
-import {
-  toEvmCaipChainId,
   type MultichainNetworkConfiguration,
 } from '@metamask/multichain-network-controller';
-import { ChainId } from '@metamask/controller-utils';
-import React, { useCallback, useContext, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import {
-  AvatarNetwork,
   Box,
-  BoxAlignItems,
   BoxFlexDirection,
   BoxJustifyContent,
   Button,
-  ButtonIcon,
-  ButtonIconSize,
   ButtonVariant,
-  BoxBackgroundColor,
-  FontWeight,
-  IconColor,
-  IconName,
   Text,
   TextColor,
-  TextVariant,
 } from '@metamask/design-system-react';
-import { AdditionalNetworksInfo } from '../../components/multichain/network-manager/components/additional-networks-info';
 import { useNetworkChangeHandlers } from '../../components/multichain/network-manager/hooks/useNetworkChangeHandlers';
 import { useNetworkItemCallbacks } from '../../components/multichain/network-manager/hooks/useNetworkItemCallbacks';
 import { NetworkListItem } from '../../components/multichain/network-list-item';
-import ToggleButton from '../../components/ui/toggle-button';
-import { MetaMetricsContext } from '../../contexts/metametrics';
 import { useI18nContext } from '../../hooks/useI18nContext';
-import { useIsNetworkGasSponsored } from '../../hooks/useIsNetworkGasSponsored';
-import { selectAdditionalNetworksBlacklistFeatureFlag } from '../../selectors/network-blacklist/network-blacklist';
-import { getSelectedMultichainNetworkChainId } from '../../selectors/multichain/networks';
 import {
   getOrderedNetworksList,
-  getShowTestNetworks,
 } from '../../selectors/selectors';
 import {
-  addNetwork,
-  setEditedNetwork,
-  setShowTestNetworks,
-} from '../../store/actions';
-import {
-  CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP,
-  FEATURED_RPCS,
-} from '../../../shared/constants/network';
-import {
-  MetaMetricsEventCategory,
-  MetaMetricsEventName,
-} from '../../../shared/constants/metametrics';
-import {
-  getFilteredFeaturedNetworks,
+  convertCaipToHexChainId,
   getNetworkIcon,
   getRpcDataByChainId,
   sortNetworks,
-  sortNetworksByPrioity,
 } from '../../../shared/lib/network.utils';
+import { CHAIN_IDS } from '../../../shared/constants/network';
 import { useNetworkManagerState } from '../../components/multichain/network-manager/hooks/useNetworkManagerState';
 import { getNetworkConfigurationsByChainId } from '../../../shared/lib/selectors/networks';
 
@@ -88,74 +53,6 @@ const filterNetworks = <
   );
 };
 
-const AdditionalNetworkRow = ({ network }: { network: AddNetworkFields }) => {
-  const t = useI18nContext();
-  const dispatch = useDispatch();
-  const { isNetworkGasSponsored } = useIsNetworkGasSponsored(network.chainId);
-  const networkImageUrl =
-    CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP[
-      network.chainId as keyof typeof CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP
-    ];
-
-  return (
-    <Box
-      flexDirection={BoxFlexDirection.Row}
-      alignItems={BoxAlignItems.Center}
-      justifyContent={BoxJustifyContent.Start}
-      onClick={async () => {
-        await dispatch(addNetwork(network, { setActive: false }));
-        dispatch(
-          setEditedNetwork({
-            chainId: network.chainId,
-            nickname: network.name,
-            editCompleted: true,
-            newNetwork: true,
-          }),
-        );
-      }}
-      paddingTop={4}
-      paddingBottom={4}
-      gap={4}
-      className="network-manager__additional-network-item w-full px-4"
-      key={network.chainId}
-      data-testid={`popular-network-${network.chainId}`}
-    >
-      <AvatarNetwork name={network.name} size="md" src={networkImageUrl} />
-      <Box
-        flexDirection={BoxFlexDirection.Row}
-        alignItems={BoxAlignItems.Center}
-        gap={2}
-      >
-        <Text
-          variant={TextVariant.BodyMd}
-          fontWeight={FontWeight.Medium}
-          color={TextColor.TextDefault}
-        >
-          {network.name}
-        </Text>
-        {isNetworkGasSponsored ? (
-          <Box
-            backgroundColor={BoxBackgroundColor.SuccessMuted}
-            className="rounded-md px-2 py-1"
-          >
-            <Text variant={TextVariant.BodySm} color={TextColor.SuccessDefault}>
-              {t('noNetworkFee')}
-            </Text>
-          </Box>
-        ) : null}
-      </Box>
-      <ButtonIcon
-        size={ButtonIconSize.Md}
-        color={IconColor.IconDefault}
-        iconName={IconName.Add}
-        data-testid="test-add-button"
-        className="ml-auto"
-        ariaLabel={t('addNetwork')}
-      />
-    </Box>
-  );
-};
-
 const SectionDivider = () => <Box className="mx-4 border-t border-muted" />;
 
 type NetworksPageListProps = {
@@ -168,21 +65,11 @@ export const NetworksPageList = ({
   footerContent,
 }: NetworksPageListProps) => {
   const t = useI18nContext();
-  const dispatch = useDispatch();
-  const { trackEvent } = useContext(MetaMetricsContext);
   const [, setSearchParams] = useSearchParams();
 
   const orderedNetworksList = useSelector(getOrderedNetworksList);
-  const showTestnets = useSelector(getShowTestNetworks);
-  const currentMultichainChainId = useSelector(
-    getSelectedMultichainNetworkChainId,
-  );
   const evmNetworks = useSelector(getNetworkConfigurationsByChainId);
-  const blacklistedChainIds = useSelector(
-    selectAdditionalNetworksBlacklistFeatureFlag,
-  );
-
-  const { nonTestNetworks, testNetworks, isNetworkInDefaultNetworkTab } =
+  const { nonTestNetworks, isNetworkInDefaultNetworkTab } =
     useNetworkManagerState({
       showDefaultNetworks: true,
     });
@@ -190,14 +77,17 @@ export const NetworksPageList = ({
     useNetworkItemCallbacks();
   const { handleNetworkChange } = useNetworkChangeHandlers();
 
-  const orderedNetworks = useMemo(
-    () =>
-      filterNetworks(
-        sortNetworks(nonTestNetworks, orderedNetworksList),
-        searchQuery,
-      ),
-    [nonTestNetworks, orderedNetworksList, searchQuery],
-  );
+  const orderedNetworks = useMemo(() => {
+    const sorted = sortNetworks(nonTestNetworks, orderedNetworksList);
+    const aircoinIndex = sorted.findIndex(
+      (n) => convertCaipToHexChainId(n.chainId) === CHAIN_IDS.AIRCOIN,
+    );
+    if (aircoinIndex > 0) {
+      const [aircoin] = sorted.splice(aircoinIndex, 1);
+      sorted.unshift(aircoin);
+    }
+    return filterNetworks(sorted, searchQuery);
+  }, [nonTestNetworks, orderedNetworksList, searchQuery]);
 
   const defaultNetworks = useMemo(
     () => orderedNetworks.filter(isNetworkInDefaultNetworkTab),
@@ -210,36 +100,6 @@ export const NetworksPageList = ({
         (network) => !isNetworkInDefaultNetworkTab(network),
       ),
     [isNetworkInDefaultNetworkTab, orderedNetworks],
-  );
-
-  const featuredNetworksNotYetEnabled = useMemo(() => {
-    const availableNetworks = FEATURED_RPCS.filter(
-      ({ chainId }) => !evmNetworks[chainId],
-    );
-
-    return getFilteredFeaturedNetworks(blacklistedChainIds, availableNetworks)
-      .sort((networkA, networkB) => networkA.name.localeCompare(networkB.name))
-      .filter((network) => filterNetworks([network], searchQuery).length > 0);
-  }, [evmNetworks, blacklistedChainIds, searchQuery]);
-
-  const sortedTestNetworks = useMemo(
-    () =>
-      filterNetworks(
-        sortNetworksByPrioity(Object.values(testNetworks), [
-          toEvmCaipChainId(ChainId.sepolia),
-          toEvmCaipChainId(ChainId['linea-sepolia']),
-        ]),
-        searchQuery,
-      ),
-    [testNetworks, searchQuery],
-  );
-
-  const currentlyOnTestnet = useMemo(
-    () =>
-      Object.values(testNetworks).some(
-        (network) => network.chainId === currentMultichainChainId,
-      ),
-    [currentMultichainChainId, testNetworks],
   );
 
   const renderNetworkListItem = useCallback(
@@ -278,25 +138,6 @@ export const NetworksPageList = ({
       hasMultiRpcOptions,
       isNetworkEnabled,
     ],
-  );
-
-  const handleToggleTestNetworks = useCallback(
-    (value: boolean) => {
-      if (currentlyOnTestnet) {
-        return;
-      }
-
-      const newValue = !value;
-      dispatch(setShowTestNetworks(newValue));
-      trackEvent({
-        event: MetaMetricsEventName.TestNetworksDisplayed,
-        category: MetaMetricsEventCategory.Network,
-        properties: {
-          value: newValue,
-        },
-      });
-    },
-    [currentlyOnTestnet, dispatch, trackEvent],
   );
 
   return (
@@ -338,46 +179,6 @@ export const NetworksPageList = ({
 
         <Box>{customNetworks.map(renderNetworkListItem)}</Box>
 
-        {sortedTestNetworks.length > 0 ? (
-          <>
-            <SectionDivider />
-            <Box
-              paddingBottom={4}
-              paddingTop={4}
-              paddingLeft={4}
-              paddingRight={4}
-              flexDirection={BoxFlexDirection.Row}
-              justifyContent={BoxJustifyContent.Between}
-              alignItems={BoxAlignItems.Center}
-            >
-              <Text color={TextColor.TextAlternative}>
-                {t('showTestnetNetworks')}
-              </Text>
-              <ToggleButton
-                dataTestId="networks-page-show-test-networks"
-                value={showTestnets || currentlyOnTestnet}
-                disabled={currentlyOnTestnet}
-                onToggle={handleToggleTestNetworks}
-              />
-            </Box>
-          </>
-        ) : null}
-
-        {showTestnets || currentlyOnTestnet ? (
-          <>{sortedTestNetworks.map(renderNetworkListItem)}</>
-        ) : null}
-
-        {featuredNetworksNotYetEnabled.length > 0 ? (
-          <>
-            <SectionDivider />
-            <AdditionalNetworksInfo />
-            <Box>
-              {featuredNetworksNotYetEnabled.map((network) => (
-                <AdditionalNetworkRow key={network.chainId} network={network} />
-              ))}
-            </Box>
-          </>
-        ) : null}
       </Box>
 
       <Box padding={4} gap={4} flexDirection={BoxFlexDirection.Column}>

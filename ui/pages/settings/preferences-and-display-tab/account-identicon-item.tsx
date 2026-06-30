@@ -18,16 +18,37 @@ import { getPreferences } from '../../../../shared/lib/selectors/preferences';
 import { getSelectedInternalAccount } from '../../../../shared/lib/selectors/accounts';
 import { SettingsSelectItem } from '../shared';
 import { PREFERENCES_ITEMS } from '../search-config';
-import { AVATAR_LABEL_MAP } from './account-identicon-utils';
+import { PolyconAvatar } from '../../../components/app/polycon-avatar';
+import {
+  AIR_AVATAR_POLYCONS,
+  AVATAR_LABEL_MAP,
+  type AirAvatarType,
+} from './account-identicon-utils';
 
 export const AccountIdenticonItem = () => {
   const t = useI18nContext();
   const { avatarType } = useSelector(getPreferences);
   const selectedAccount = useSelector(getSelectedInternalAccount);
 
-  const currentVariant: AvatarAccountVariant =
-    avatarType ?? AvatarAccountVariant.Maskicon;
-  const labelKey = AVATAR_LABEL_MAP[currentVariant];
+  const currentVariant: AirAvatarType = avatarType ?? AIR_AVATAR_POLYCONS;
+  const labelKey = AVATAR_LABEL_MAP[currentVariant] ?? AVATAR_LABEL_MAP[AIR_AVATAR_POLYCONS];
+
+  // 'maskicon' is the legacy MetaMask default — AIR Wallet shows Polycons instead
+  const usePolycons =
+    currentVariant === AIR_AVATAR_POLYCONS || currentVariant === AvatarAccountVariant.Maskicon;
+
+  const avatarPreview = usePolycons ? (
+    <PolyconAvatar
+      address={selectedAccount?.address}
+      size={AvatarAccountSize.Sm}
+    />
+  ) : (
+    <AvatarAccount
+      address={selectedAccount?.address}
+      variant={currentVariant as AvatarAccountVariant}
+      size={AvatarAccountSize.Sm}
+    />
+  );
 
   return (
     <SettingsSelectItem
@@ -39,11 +60,7 @@ export const AccountIdenticonItem = () => {
           alignItems={BoxAlignItems.Center}
           gap={2}
         >
-          <AvatarAccount
-            address={selectedAccount?.address}
-            variant={currentVariant}
-            size={AvatarAccountSize.Sm}
-          />
+          {avatarPreview}
           <Text
             color={TextColor.TextAlternative}
             variant={TextVariant.BodyMd}

@@ -505,7 +505,7 @@ exports[`AssetPage should render an ERC20 asset without prices 1`] = `
             <img
               alt="We could not fetch any historical data"
               height="72"
-              src="/images/empty-state-asset-details-light.png"
+              src="/images/water-mark.png"
               width="72"
             />
             <p

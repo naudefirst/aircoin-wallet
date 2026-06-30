@@ -72,14 +72,6 @@ export const AdditionalNetworksInfo = memo(() => {
           justifyContent={JustifyContent.center}
           ref={setBoxRef}
         >
-          {/* Label text - uses translation key "additionalNetworks" */}
-          <Text
-            color={TextColor.textAlternative}
-            variant={TextVariant.bodyMdMedium}
-          >
-            {t('additionalNetworks')}
-          </Text>
-
           {/* Info icon with hover trigger for popover */}
           <Box
             display={Display.Flex}

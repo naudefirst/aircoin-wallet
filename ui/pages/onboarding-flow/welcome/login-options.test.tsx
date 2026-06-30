@@ -147,14 +147,14 @@ describe('LoginOptions', () => {
 
     expect(termsLink).toHaveAttribute(
       'href',
-      'https://consensys.io/terms-of-use',
+      'https://pages.myairdrive.com/root/aircoin-lagals/terms.html',
     );
     expect(termsLink).toHaveAttribute('target', '_blank');
     expect(termsLink).toHaveAttribute('rel', 'noopener noreferrer');
 
     expect(privacyLink).toHaveAttribute(
       'href',
-      'https://consensys.io/privacy-notice',
+      'https://pages.myairdrive.com/root/aircoin-lagals/privacy.html',
     );
     expect(privacyLink).toHaveAttribute('target', '_blank');
     expect(privacyLink).toHaveAttribute('rel', 'noopener noreferrer');

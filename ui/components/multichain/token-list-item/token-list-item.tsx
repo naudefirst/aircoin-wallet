@@ -311,24 +311,7 @@ export const TokenListItemComponent = ({
               {isNoFeeAsset && <Tag label={t('bridgeNoMMFee')} />}
             </Box>
 
-            {showScamWarning ? (
-              <ButtonIcon
-                iconName={IconName.Danger}
-                onClick={(
-                  e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-                ) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowScamWarningModal(true);
-                }}
-                color={IconColor.errorDefault}
-                size={ButtonIconSize.Md}
-                backgroundColor={BackgroundColor.transparent}
-                data-testid="scam-warning"
-                ariaLabel=""
-              />
-            ) : (
-              <SensitiveText
+            <SensitiveText
                 fontWeight={FontWeight.Medium}
                 variant={TextVariant.bodyMd}
                 textAlign={TextAlign.End}
@@ -339,7 +322,6 @@ export const TokenListItemComponent = ({
               >
                 {secondary}
               </SensitiveText>
-            )}
           </Box>
 
           <Box

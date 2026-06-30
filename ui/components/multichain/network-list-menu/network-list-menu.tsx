@@ -21,17 +21,14 @@ import {
 } from '@metamask/network-controller';
 import {
   NON_EVM_TESTNET_IDS,
-  toEvmCaipChainId,
   type MultichainNetworkConfiguration,
 } from '@metamask/multichain-network-controller';
 import { type CaipChainId, type Hex } from '@metamask/utils';
-import { ChainId } from '@metamask/controller-utils';
 import { useI18nContext } from '../../../hooks/useI18nContext';
 import { useAccountNetworkAvailability } from '../../../hooks/accounts/useAccountNetworkAvailability';
 import { NetworkListItem } from '../network-list-item';
 import {
   setActiveNetwork,
-  setShowTestNetworks,
   showModal,
   toggleNetworkMenu,
   updateNetworksList,
@@ -49,11 +46,9 @@ import {
   TEST_CHAINS,
   CHAIN_ID_PORTFOLIO_LANDING_PAGE_URL_MAP,
   BUILT_IN_NETWORKS,
-  CAIP_FORMATTED_TEST_CHAINS,
 } from '../../../../shared/constants/network';
 import { MultichainNetworks } from '../../../../shared/constants/multichain/networks';
 import {
-  getShowTestNetworks,
   getOriginOfCurrentTab,
   getEditedNetwork,
   getOrderedNetworksList,
@@ -68,8 +63,6 @@ import {
   getAllChainsToPoll,
 } from '../../../selectors';
 import { getPreferences } from '../../../../shared/lib/selectors/preferences';
-import { selectAdditionalNetworksBlacklistFeatureFlag } from '../../../selectors/network-blacklist/network-blacklist';
-import ToggleButton from '../../ui/toggle-button';
 import {
   Display,
   FlexDirection,
@@ -100,8 +93,6 @@ import {
   sortNetworks,
   getNetworkIcon,
   getRpcDataByChainId,
-  sortNetworksByPrioity,
-  getFilteredFeaturedNetworks,
 } from '../../../../shared/lib/network.utils';
 import { getCompletedOnboarding } from '../../../ducks/metamask/metamask';
 import { getIsUnlocked } from '../../../ducks/metamask/base-selectors';
@@ -109,7 +100,6 @@ import NetworksForm from '../networks-form';
 import { useNetworkFormState } from '../networks-form/networks-form-state';
 import { openWindow } from '../../../helpers/utils/window';
 import { endTrace, TraceName } from '../../../../shared/lib/trace';
-import PopularNetworkList from './popular-network-list/popular-network-list';
 import NetworkListSearch from './network-list-search/network-list-search';
 import AddRpcUrlModal from './add-rpc-url-modal/add-rpc-url-modal';
 import { SelectRpcUrlModal } from './select-rpc-url-modal/select-rpc-url-modal';
@@ -170,7 +160,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
   const { hasAnyAccountsInNetwork } = useAccountNetworkAvailability();
 
   const { tokenNetworkFilter } = useSelector(getPreferences);
-  const showTestnets = useSelector(getShowTestNetworks);
   const selectedTabOrigin = useSelector(getOriginOfCurrentTab);
   const isUnlocked = useSelector(getIsUnlocked);
   const domains = useSelector(getAllDomains);
@@ -206,10 +195,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
   );
 
   const allChainIds = useSelector(getAllChainsToPoll);
-  // Get blacklisted chain IDs from feature flag
-  const blacklistedChainIds = useSelector(
-    selectAdditionalNetworksBlacklistFeatureFlag,
-  );
   const canSelectNetwork: boolean =
     Boolean(selectedTabOrigin) &&
     Boolean(domains[selectedTabOrigin]) &&
@@ -219,30 +204,25 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
     endTrace({ name: TraceName.NetworkList });
   }, []);
 
-  const currentlyOnTestnet =
-    CAIP_FORMATTED_TEST_CHAINS.includes(currentChainId);
-
-  const [nonTestNetworks, testNetworks] = useMemo(
+  const nonTestNetworks = useMemo(
     () =>
       Object.entries(multichainNetworks).reduce(
-        ([nonTestnetsList, testnetsList], [id, network]) => {
+        (nonTestnetsList, [id, network]) => {
           let chainId = id;
           let isTest = false;
 
           if (network.isEvm) {
-            // We keep using raw chain ID for EVM.
             chainId = convertCaipToHexChainId(network.chainId);
             isTest = TEST_CHAINS.includes(chainId as Hex);
           } else {
             isTest = NON_EVM_TESTNET_IDS.includes(network.chainId);
           }
-          (isTest ? testnetsList : nonTestnetsList)[chainId] = network;
-          return [nonTestnetsList, testnetsList];
+          if (!isTest) {
+            nonTestnetsList[chainId] = network;
+          }
+          return nonTestnetsList;
         },
-        [
-          {} as Record<string, MultichainNetworkConfiguration>,
-          {} as Record<string, MultichainNetworkConfiguration>,
-        ],
+        {} as Record<string, MultichainNetworkConfiguration>,
       ),
     [multichainNetworks],
   );
@@ -283,22 +263,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
     [nonTestNetworks, orderedNetworksList],
   );
 
-  const featuredNetworksNotYetEnabled = useMemo(() => {
-    // Filter out networks that are already enabled
-    const availableNetworks = FEATURED_RPCS.filter(
-      ({ chainId }) => !evmNetworks[chainId],
-    );
-
-    // Apply blacklist filter to exclude blacklisted networks
-    const filteredNetworks = getFilteredFeaturedNetworks(
-      blacklistedChainIds,
-      availableNetworks,
-    );
-
-    // Sort alphabetically
-    return filteredNetworks.sort((a, b) => a.name.localeCompare(b.name));
-  }, [evmNetworks, blacklistedChainIds]);
-
   // Searches networks by user input
   const [searchQuery, setSearchQuery] = useState('');
   const [focusSearch, setFocusSearch] = useState(false);
@@ -319,14 +283,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
         }).search(query);
 
   const searchedEnabledNetworks = searchNetworks(orderedNetworks, searchQuery);
-  const searchedFeaturedNetworks = searchNetworks(
-    featuredNetworksNotYetEnabled,
-    searchQuery,
-  );
-  const searchedTestNetworks = searchNetworks(
-    Object.values(testNetworks),
-    searchQuery,
-  );
   const searchedDefaultNetworks = searchedEnabledNetworks.filter(
     (network) => !isCustomNetworkConfiguration(network),
   );
@@ -359,15 +315,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
       setOrderedNetworks(newOrderedNetworks);
     }
   };
-
-  // A sorted list of test networks that put Sepolia first then Linea Sepolia at the top
-  // and the rest of the test networks in alphabetical order.
-  const sortedTestNetworks = useMemo(() => {
-    return sortNetworksByPrioity(searchedTestNetworks, [
-      toEvmCaipChainId(ChainId.sepolia),
-      toEvmCaipChainId(ChainId['linea-sepolia']),
-    ]);
-  }, [searchedTestNetworks]);
 
   const getMultichainNetworkConfigurationOrThrow = (chainId: CaipChainId) => {
     const network = multichainNetworks[chainId];
@@ -643,8 +590,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
             />
             <Box>
               {!hasEnabledNetworkResults &&
-              searchedFeaturedNetworks.length === 0 &&
-              searchedTestNetworks.length === 0 &&
               focusSearch ? (
                 <Text
                   paddingLeft={4}
@@ -710,49 +655,6 @@ export const NetworkListMenu = ({ onClose }: NetworkListMenuProps) => {
                 </DragDropContext>
               )}
 
-              {searchedTestNetworks.length > 0 ? (
-                <Box
-                  paddingBottom={4}
-                  paddingTop={4}
-                  paddingLeft={4}
-                  paddingRight={4}
-                  display={Display.Flex}
-                  justifyContent={JustifyContent.spaceBetween}
-                >
-                  <Text color={TextColor.textAlternative}>
-                    {t('showTestnetNetworks')}
-                  </Text>
-                  <ToggleButton
-                    dataTestId="network-menu-show-test-networks"
-                    value={showTestnets || currentlyOnTestnet}
-                    disabled={currentlyOnTestnet}
-                    onToggle={(value: boolean) => {
-                      const newVal = !value;
-                      dispatch(setShowTestNetworks(newVal));
-                      trackEvent({
-                        event: MetaMetricsEventName.TestNetworksDisplayed,
-                        category: MetaMetricsEventCategory.Network,
-                        properties: {
-                          value: newVal,
-                        },
-                      });
-                    }}
-                  />
-                </Box>
-              ) : null}
-
-              {showTestnets || currentlyOnTestnet ? (
-                <Box className="multichain-network-list-menu">
-                  {sortedTestNetworks.map((network) =>
-                    generateMultichainNetworkListItem(network),
-                  )}
-                </Box>
-              ) : null}
-
-              <PopularNetworkList
-                searchAddNetworkResults={searchedFeaturedNetworks}
-                data-testid="add-popular-network-view"
-              />
             </Box>
           </Box>
 

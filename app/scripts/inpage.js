@@ -115,11 +115,28 @@ if (shouldInjectProvider()) {
     shouldSendMetadata: false,
     providerInfo: {
       uuid: uuid(),
-      name: process.env.METAMASK_BUILD_NAME,
-      icon: process.env.METAMASK_BUILD_ICON,
-      rdns: process.env.METAMASK_BUILD_APP_ID,
+      name: 'AIR Wallet',
+      icon: chrome.runtime.getURL('images/icon-128.png'),
+      rdns: 'com.myaircoins.airwallet',
     },
   });
+
+  // Expose AIR Wallet identity — override the inherited isMetaMask=true from
+  // the MetaMask provider base class so dApps and wallet selectors treat this
+  // as AIR Wallet, not MetaMask.
+  if (window.ethereum) {
+    try {
+      Object.defineProperty(window.ethereum, 'isMetaMask', {
+        value: false,
+        writable: true,
+        configurable: true,
+      });
+    } catch (_) {
+      // property already non-configurable in some builds; best-effort
+    }
+    window.ethereum.isAirWallet = true;
+    window.airWallet = window.ethereum;
+  }
 
   // Solana Wallet Standard registration
   const solanaMultichainClient = getMultichainClient({
@@ -127,7 +144,7 @@ if (shouldInjectProvider()) {
   });
   registerSolanaWalletStandard({
     client: solanaMultichainClient,
-    walletName: process.env.METAMASK_BUILD_NAME,
+    walletName: 'AIR Wallet',
   });
 
   // Bitcoin SatsConnect Wallet Standard registration
@@ -136,6 +153,6 @@ if (shouldInjectProvider()) {
   });
   registerBitcoinWalletStandard({
     client: btcMultichainClient,
-    walletName: process.env.METAMASK_BUILD_NAME,
+    walletName: 'AIR Wallet',
   });
 }

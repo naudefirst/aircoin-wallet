@@ -359,7 +359,10 @@ export const MultichainTriggeredAddressRowsList = ({
 
   const renderedRows = useMemo(() => {
     const rows = sortByPriorityNetworks(getAccountsSpreadByNetworkByGroupId);
-    return rows.map((item, index) => renderAddressItem(item, index));
+    const evmRows = rows.filter((item) =>
+      item.scopes.some((scope) => scope.startsWith('eip155:')),
+    );
+    return evmRows.map((item, index) => renderAddressItem(item, index));
   }, [
     getAccountsSpreadByNetworkByGroupId,
     renderAddressItem,

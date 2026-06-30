@@ -12,7 +12,7 @@ export const AssetChartEmptyState = () => {
   const assetDetailsIcon =
     theme === ThemeType.dark
       ? '/images/empty-state-asset-details-dark.png'
-      : '/images/empty-state-asset-details-light.png';
+      : '/images/water-mark.png';
 
   return (
     <Box

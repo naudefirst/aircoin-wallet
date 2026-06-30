@@ -39,8 +39,6 @@ import {
   ONBOARDING_ROUTE,
   PERMISSIONS,
   REVIEW_PERMISSIONS,
-  SNAPS_ROUTE,
-  SNAPS_VIEW_ROUTE,
   NOTIFICATIONS_ROUTE,
   NOTIFICATIONS_SETTINGS_ROUTE,
   CROSS_CHAIN_SWAP_ROUTE,
@@ -66,16 +64,10 @@ import {
   TOKEN_TRANSFER_ROUTE,
   REVIEW_GATOR_PERMISSIONS_ROUTE,
   REWARDS_ROUTE,
-  PERPS_MARKET_LIST_ROUTE,
   DECRYPT_MESSAGE_REQUEST_PATH,
   ENCRYPTION_PUBLIC_KEY_REQUEST_PATH,
-  PERPS_MARKET_DETAIL_ROUTE,
-  PERPS_ORDER_ENTRY_ROUTE,
-  PERPS_ACTIVITY_ROUTE,
-  PERPS_WITHDRAW_ROUTE,
   CONTACTS_ROUTE,
   HARDWARE_WALLET_REPAIR_ROUTE,
-  BATCH_SELL_ROOT_ROUTE,
 } from '../../helpers/constants/routes';
 import { MUSD_CONVERSION_ROUTE } from '../musd/constants/routes';
 import { getProviderConfig } from '../../../shared/lib/selectors/networks';
@@ -95,7 +87,6 @@ import {
   setLastActiveTime,
   hideImportTokensModal,
   hideDeprecatedNetworkModal,
-  hideKeyringRemovalResultModal,
 } from '../../store/actions';
 import { pageChanged } from '../../ducks/history/history';
 import { getCompletedOnboarding } from '../../ducks/metamask/metamask';
@@ -106,13 +97,11 @@ import { DEFAULT_AUTO_LOCK_TIME_LIMIT } from '../../../shared/constants/preferen
 import {
   ENVIRONMENT_TYPE_POPUP,
   ENVIRONMENT_TYPE_SIDEPANEL,
-  SNAP_MANAGE_ACCOUNTS_CONFIRMATION_TYPES,
 } from '../../../shared/constants/app';
 import { getEnvironmentType } from '../../../shared/lib/environment-type';
 import QRHardwarePopover from '../../components/app/qr-hardware-popover';
 import { ToggleIpfsModal } from '../../components/app/assets/nfts/nft-default-image/toggle-ipfs-modal';
 import { BasicConfigurationModal } from '../../components/app/basic-configuration-modal';
-import KeyringSnapRemovalResult from '../../components/app/modals/keyring-snap-removal-modal';
 
 import { DeprecatedNetworkModal } from '../../components/app/deprecated-network-modal/DeprecatedNetworkModal';
 import NetworkConfirmationPopover from '../../components/multichain/network-list-menu/network-confirmation-popover/network-confirmation-popover';
@@ -136,9 +125,7 @@ import RequireBasicFunctionality from '../../helpers/higher-order-components/req
 import { getCurrencyRateControllerCurrentCurrency } from '../../../shared/lib/selectors/assets-migration';
 import { Toaster } from '../../components/ui/toast/toast';
 import { ToastListener } from '../../components/app/toast-listener/toast-listener';
-import { ALLOWED_CAPABILITIES as SNAP_VIEW_ROUTE_ALLOWED_CAPABILITIES } from '../snaps/snap-view/messenger';
 import { createRouteWithMessenger } from '../../helpers/route-messenger-helpers';
-import BatchSell from '../batch-sell/batch-sell-page';
 import { getIsTokenManagementFilterEnabled } from '../../selectors/multichain/feature-flags';
 import { getConnectingLabel, setTheme } from './utils';
 import { ConfirmationRouter } from './confirmation-router';
@@ -166,8 +153,6 @@ const NotificationDetails = mmLazy(
   () => import('../notification-details/index.js'),
 );
 const Notifications = mmLazy(() => import('../notifications/index.js'));
-const SnapList = mmLazy(() => import('../snaps/snaps-list/index.js'));
-const SnapView = mmLazy(() => import('../snaps/snap-view/index.js'));
 const ConfirmEncryptionPublicKey = mmLazy(
   () => import('../confirm-encryption-public-key/index.js'),
 );
@@ -228,21 +213,7 @@ const SmartAccountPage = mmLazy(
   () => import('../multichain-accounts/smart-account-page/index.ts'),
 );
 const ShieldPlan = mmLazy(() => import('../shield/plan/index.ts'));
-const PerpsMarketDetailPage = mmLazy(
-  () => import('../perps/perps-market-detail-page.tsx'),
-);
-const MarketListView = mmLazy(() => import('../perps/market-list/index.tsx'));
-const PerpsActivityPage = mmLazy(
-  () => import('../perps/perps-activity-page.tsx'),
-);
-const PerpsWithdrawPage = mmLazy(
-  () => import('../perps/perps-withdraw-page.tsx'),
-);
-const PerpsOrderEntryPage = mmLazy(
-  () => import('../perps/perps-order-entry-page.tsx'),
-);
 const MusdConversionPage = mmLazy(() => import('../musd/index.tsx'));
-const PerpsLayout = mmLazy(() => import('../perps/perps-layout.tsx'));
 const HardwareWalletRepair = mmLazy(
   () => import('../hardware-wallet-repair/index.ts'),
 );
@@ -479,19 +450,6 @@ export const routeConfig = [
             element: <Notifications />,
           },
           {
-            path: SNAPS_ROUTE,
-            element: <SnapList />,
-          },
-          createRouteWithMessenger({
-            path: SNAPS_VIEW_ROUTE,
-            capabilities: SNAP_VIEW_ROUTE_ALLOWED_CAPABILITIES,
-            element: <SnapView />,
-          }),
-          {
-            path: `${BATCH_SELL_ROOT_ROUTE}/*`,
-            element: <BatchSell />,
-          },
-          {
             path: `${CROSS_CHAIN_SWAP_TX_DETAILS_ROUTE}/:txHash`,
             element: <CrossChainSwapTxDetails />,
           },
@@ -514,31 +472,6 @@ export const routeConfig = [
           {
             path: REWARDS_ROUTE,
             element: <RewardsPage />,
-          },
-          {
-            element: <PerpsLayout />,
-            children: [
-              {
-                path: `${PERPS_MARKET_DETAIL_ROUTE}/:symbol`,
-                element: <PerpsMarketDetailPage />,
-              },
-              {
-                path: `${PERPS_ORDER_ENTRY_ROUTE}/:symbol`,
-                element: <PerpsOrderEntryPage />,
-              },
-              {
-                path: PERPS_ACTIVITY_ROUTE,
-                element: <PerpsActivityPage />,
-              },
-              {
-                path: PERPS_MARKET_LIST_ROUTE,
-                element: <MarketListView />,
-              },
-              {
-                path: PERPS_WITHDRAW_ROUTE,
-                element: <PerpsWithdrawPage />,
-              },
-            ],
           },
         ],
       },
@@ -596,14 +529,9 @@ export default function Routes() {
     (state) => state.metamask.currentExtensionPopupId,
   );
 
-  const isShowKeyringSnapRemovalResultModal = useAppSelector(
-    (state) => state.appState.showKeyringRemovalSnapModal,
-  );
   const pendingConfirmations = useAppSelector(
     getUnapprovedConfirmations,
   ) as ApprovalRequest<Record<string, Json>>[];
-  const hideShowKeyringSnapRemovalResultModal = () =>
-    dispatch(hideKeyringRemovalResultModal());
 
   // Multichain intro modal logic (extracted to custom hook)
   const { showMultichainIntroModal, setShowMultichainIntroModal } =
@@ -694,11 +622,6 @@ export default function Routes() {
   const isLoadingShown =
     isLoading &&
     completedOnboarding &&
-    !pendingConfirmations.some(
-      (confirmation) =>
-        confirmation.type ===
-        SNAP_MANAGE_ACCOUNTS_CONFIRMATION_TYPES.showSnapAccountRedirect,
-    ) &&
     // In the redesigned screens, we hide the general loading spinner and the
     // loading states are on a component by component basis.
     !isUsingRedesignedConfirmationType &&
@@ -743,12 +666,6 @@ export default function Routes() {
           onClose={() => dispatch(hideDeprecatedNetworkModal())}
         />
       ) : null}
-      {isShowKeyringSnapRemovalResultModal && (
-        <KeyringSnapRemovalResult
-          isOpen={isShowKeyringSnapRemovalResultModal}
-          onClose={hideShowKeyringSnapRemovalResultModal}
-        />
-      )}
 
       {showMultichainIntroModal ? (
         <MultichainAccountIntroModalContainer

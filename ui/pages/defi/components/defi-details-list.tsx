@@ -13,7 +13,6 @@ import { useI18nContext } from '../../../hooks/useI18nContext';
 import TokenCell from '../../../components/app/assets/token-cell';
 import { getPreferences } from '../../../../shared/lib/selectors/preferences';
 import { TokenWithFiatAmount } from '../../../components/app/assets/types';
-import { useSafeChains } from '../../../components/multichain/networks-form/use-safe-chains';
 import { getTokenAvatarUrl } from '../../../components/app/assets/util/getTokenAvatarUrl';
 
 export const PositionTypeLabels = {
@@ -89,8 +88,6 @@ const DefiDetailsList = React.memo(
       };
     };
 
-    const { safeChains } = useSafeChains();
-
     return (
       <>
         {groupedTokens.map(({ underlying, underlyingRewards }, index) => {
@@ -131,7 +128,6 @@ const DefiDetailsList = React.memo(
                         privacyMode={privacyMode}
                         onClick={undefined}
                         fixCurrencyToUSD
-                        safeChains={safeChains}
                       />
                     ))}
                   </Box>

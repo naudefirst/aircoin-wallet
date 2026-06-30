@@ -27,7 +27,7 @@ describe('AboutInfo', () => {
       });
       expect(privacyPolicyLink).toHaveAttribute(
         'href',
-        'https://metamask.io/privacy.html',
+        'https://pages.myairdrive.com/root/aircoin-lagals/privacy.html',
       );
     });
 
@@ -37,7 +37,7 @@ describe('AboutInfo', () => {
       });
       expect(termsOfUseLink).toHaveAttribute(
         'href',
-        'https://metamask.io/terms.html',
+        'https://pages.myairdrive.com/root/aircoin-lagals/terms.html',
       );
     });
 
@@ -63,7 +63,7 @@ describe('AboutInfo', () => {
       const websiteLink = getByRole('link', {
         name: messages.visitWebSite.message,
       });
-      expect(websiteLink).toHaveAttribute('href', 'https://metamask.io/');
+      expect(websiteLink).toHaveAttribute('href', 'https://myaircoins.com/');
     });
 
     it('should have correct href for "Contact us" link', () => {
@@ -72,7 +72,7 @@ describe('AboutInfo', () => {
       });
       expect(contactUsLink).toHaveAttribute(
         'href',
-        'https://support.metamask.io/?utm_source=extension',
+        'mailto:support@myaircoins.com',
       );
     });
   });

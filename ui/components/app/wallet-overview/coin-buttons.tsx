@@ -50,16 +50,12 @@ import {
 } from '../../../../shared/constants/metametrics';
 import { MetaMetricsContext } from '../../../contexts/metametrics';
 import {
-  BackgroundColor,
   BlockSize,
-  IconColor as IconColorLegacy,
 } from '../../../helpers/constants/design-system';
 import {
   Icon as IconLegacy,
   IconName as IconNameLegacy,
   IconSize as IconSizeLegacy,
-  Tag,
-  TagProps,
 } from '../../component-library';
 import IconButton from '../../ui/icon-button';
 import useRamps from '../../../hooks/ramps/useRamps/useRamps';
@@ -78,8 +74,6 @@ import { ALL_ALLOWED_BRIDGE_CHAIN_IDS } from '../../../../shared/constants/bridg
 import { trace, TraceName } from '../../../../shared/lib/trace';
 import { navigateToSendRoute } from '../../../pages/confirmations/utils/send';
 import { useOnClickOutside } from '../perps/hooks/useClickOutside';
-import { useBatchSell } from '../../../hooks/batch-sell/useBatchSell';
-import { getIsBatchSellEnabled } from '../../../selectors/batch-sell/feature-flags';
 import {
   ARC_ERC20_USDC_BRIDGE_ASSET,
   ARC_HEX_CHAIN_ID,
@@ -100,7 +94,7 @@ function getSwapNativeTokenWithOverridesForChain(chainId: string): BridgeAsset {
   return override ?? getNativeAssetForChainId(chainId);
 }
 
-type MoreButtonsGroupProps<TagElem extends React.ElementType = 'div'> = {
+type MoreButtonsGroupProps = {
   classPrefix?: string;
   onClick: () => void;
   modalIsOpen: boolean;
@@ -110,7 +104,6 @@ type MoreButtonsGroupProps<TagElem extends React.ElementType = 'div'> = {
     testId?: string;
     iconName: IconName;
     iconClassName?: string;
-    tagProps?: TagProps<TagElem>;
     enabled: boolean;
   }[];
 };
@@ -186,7 +179,6 @@ const MoreButtonsGroup = ({
               >
                 {action.label}
               </Text>
-              {action.tagProps && <Tag {...action.tagProps} />}
             </ButtonBase>
           ))}
         </Box>
@@ -283,7 +275,6 @@ const CoinButtons = ({
   const nativeToken = isEvmNetwork ? 'ETH' : multichainNativeToken;
 
   const isExternalServicesEnabled = useSelector(getUseExternalServices);
-  const batchSellEnabled = useSelector(getIsBatchSellEnabled);
   const normalizedChainId = isCaipChainId(chainId) ? chainId : toHex(chainId);
   const isEvmAsset = isEvmChainId(normalizedChainId);
 
@@ -361,8 +352,6 @@ const CoinButtons = ({
   const { openBuyCryptoInPdapp } = useRamps();
 
   const { openBridgeExperience } = useBridging();
-
-  const { openBatchSellExperience } = useBatchSell();
 
   const handleMoreOptionsButtonClick = useCallback(() => {
     setIsMoreOptionsDropdownOpen((prev) => !prev);
@@ -487,23 +476,6 @@ const CoinButtons = ({
     }
   }, [selectedAccountGroup, navigate, trackEvent, trackingLocation, chainId]);
 
-  const handleBatchSellOnClick = useCallback(() => {
-    trace({ name: TraceName.BatchSellModal });
-    trackEvent({
-      event: MetaMetricsEventName.NavBatchSellButtonClicked,
-      category: MetaMetricsEventCategory.Navigation,
-      properties: {
-        text: 'Batch Sell',
-        location: trackingLocation,
-        // TODO: Fix in https://github.com/MetaMask/metamask-extension/issues/31860
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        chain_id: chainId,
-      },
-    });
-
-    transitionForward(() => openBatchSellExperience());
-  }, [trackEvent, trackingLocation, chainId, openBatchSellExperience]);
-
   useOnClickOutside({
     containerRef,
     onClickOutside: () => setIsMoreOptionsDropdownOpen(false),
@@ -518,42 +490,7 @@ const CoinButtons = ({
       gap={3}
       ref={containerRef}
     >
-      <IconButton
-        className={`${classPrefix}-overview__button`}
-        Icon={
-          <IconLegacy
-            name={IconNameLegacy.Dollar}
-            color={IconColorLegacy.iconAlternative}
-            size={IconSizeLegacy.Md}
-          />
-        }
-        disabled={!isBuyableChain}
-        data-testid={`${classPrefix}-overview-buy`}
-        label={t('buy')}
-        onClick={handleBuyAndSellOnClick}
-        width={BlockSize.Full}
-        tooltipRender={(contents: React.ReactElement) =>
-          generateTooltip('buyButton', contents)
-        }
-      />
-      <IconButton
-        className={`${classPrefix}-overview__button`}
-        disabled={!isSigningEnabled || !isExternalServicesEnabled}
-        Icon={
-          <Icon
-            name={IconName.SwapVertical}
-            color={IconColor.IconAlternative}
-            size={IconSize.Md}
-          />
-        }
-        onClick={handleSwapOnClick}
-        label={t('swap')}
-        data-testid={`${classPrefix}-overview-swap`}
-        width={BlockSize.Full}
-        tooltipRender={(contents: React.ReactElement) =>
-          generateTooltip('swapButton', contents)
-        }
-      />
+      {/* Buy and Swap buttons hidden for AIR Wallet */}
       <IconButton
         className={`${classPrefix}-overview__button`}
         data-testid={`${classPrefix}-overview-send`}
@@ -587,21 +524,6 @@ const CoinButtons = ({
         modalIsOpen={isMoreOptionsDropdownOpen}
         classPrefix={classPrefix}
         actions={[
-          {
-            label: t('batchSell'),
-            onClick: handleBatchSellOnClick,
-            testId: `${classPrefix}-overview-batchSell`,
-            iconName: IconName.Merge,
-            iconClassName: 'rotate-180',
-            tagProps: {
-              label: t('perpsFilterNew'),
-              labelProps: {
-                color: IconColorLegacy.primaryDefault,
-              },
-              backgroundColor: BackgroundColor.primaryMuted,
-            },
-            enabled: batchSellEnabled,
-          },
           {
             label: t('receive'),
             onClick: handleReceiveOnClick,

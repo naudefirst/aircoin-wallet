@@ -177,7 +177,7 @@ const ClaimsList = () => {
       const activityIcon =
         theme === ThemeType.dark
           ? './images/empty-state-activity-dark.png'
-          : './images/empty-state-activity-light.png';
+          : './images/magnify.png';
 
       return (
         <Box className="h-full flex justify-center items-center">

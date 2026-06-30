@@ -1,9 +1,6 @@
 import { EventEmitter } from 'events';
 import React, {
   Component,
-  ComponentType,
-  lazy,
-  Suspense,
   FormEvent,
   ChangeEvent,
   MutableRefObject,
@@ -65,8 +62,9 @@ import { captureException } from '../../../shared/lib/sentry';
 import { getCaretCoordinates } from './unlock-page.util';
 import { UnlockPasskeyIconButton, UnlockPasskeySection } from './passkey';
 import ResetPasswordModal from './reset-password-modal';
+// eslint-disable-next-line import-x/no-restricted-paths -- TODO(ADR-0021): route-isolation backlog
+import WalletReadyAnimation from '../onboarding-flow/creation-successful/wallet-ready-animation';
 import FormattedCounter from './formatted-counter';
-import { MetamaskWordmarkLogo } from './metamask-wordmark-logo';
 
 type UnlockPageProps = UnlockPageContext & {
   navigate: NavigateFunction;
@@ -121,19 +119,6 @@ type LoginError = {
   };
 };
 
-const FoxAppearAnimation = lazy(
-  () =>
-    // @ts-expect-error - Build system resolves without extension, but TS wants .js
-    // eslint-disable-next-line import-x/no-restricted-paths -- TODO(ADR-0021): route-isolation backlog
-    import('../onboarding-flow/welcome/fox-appear-animation') as Promise<{
-      default: ComponentType<
-        React.PropsWithChildren<{
-          isLoader?: boolean;
-          skipTransition?: boolean;
-        }>
-      >;
-    }>,
-);
 
 class UnlockPageBase extends Component<UnlockPageProps, UnlockPageState> {
   private get ctx(): UnlockPageContext {
@@ -639,7 +624,7 @@ class UnlockPageBase extends Component<UnlockPageProps, UnlockPageState> {
         {isRehydrationFlow ? (
           this.renderMascot()
         ) : (
-          <MetamaskWordmarkLogo isPopup={this.props.isPopup ?? false} />
+          <WalletReadyAnimation />
         )}
         {isBeta() ? (
           <Text
@@ -851,11 +836,6 @@ class UnlockPageBase extends Component<UnlockPageProps, UnlockPageState> {
             />
           )}
         </Box>
-        {!isRehydrationFlow && (
-          <Suspense fallback={<Box />}>
-            <FoxAppearAnimation />
-          </Suspense>
-        )}
       </Box>
     );
   }

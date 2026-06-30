@@ -151,7 +151,7 @@ export const getDefaultPreferencesControllerState =
     overrideContentSecurityPolicyHeader: true,
     preferences: {
       autoLockTimeLimit: undefined,
-      avatarType: 'maskicon',
+      avatarType: 'polycons',
       dismissSmartAccountSuggestionEnabled: false,
       featureNotificationsEnabled: false,
       hideZeroBalanceTokens: false,

@@ -1,25 +1,7 @@
 import type { Hex } from '@metamask/utils';
-import React, { useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { isEvmChainId } from '../../../../../shared/lib/asset-utils';
-import { NETWORKS_ROUTE } from '../../../../helpers/constants/routes';
+import React, { useMemo } from 'react';
 import { useMusdBalance, useMusdCtaVisibility } from '../../../../hooks/musd';
 import { useI18nContext } from '../../../../hooks/useI18nContext';
-import {
-  getSafeNativeCurrencySymbol,
-  type SafeChain,
-} from '../../../multichain/networks-form/use-safe-chains';
-import { setEditedNetwork } from '../../../../store/actions';
-import {
-  ButtonSecondary,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from '../../../component-library';
 import { ClaimBonusBadge, MusdConvertLink, useMerklRewards } from '../../musd';
 import { getBonusAmountRange } from '../../musd/merkl-bonus-analytics';
 import type {
@@ -49,7 +31,6 @@ export type TokenCellProps = {
   privacyMode?: boolean;
   onClick?: () => void;
   fixCurrencyToUSD?: boolean;
-  safeChains?: SafeChain[];
   /** Merkl claim bonus and/or mUSD convert surfaces; parent must pass explicit analytics locations. */
   musd?: TokenCellMusdOptions;
 };
@@ -61,18 +42,9 @@ export default function TokenCell({
   privacyMode = false,
   onClick,
   fixCurrencyToUSD = false,
-  safeChains,
   musd,
 }: TokenCellProps) {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const t = useI18nContext();
-  const isEvm = isEvmChainId(token.chainId);
-  const nativeCurrencySymbol = useMemo(
-    () => getSafeNativeCurrencySymbol(safeChains, token.chainId),
-    [safeChains, token.chainId],
-  );
-  const [showScamWarningModal, setShowScamWarningModal] = useState(false);
 
   const showMerklBadge = Boolean(musd?.merklClaimBonus);
 
@@ -131,10 +103,6 @@ export default function TokenCell({
     [claimableRewardDisplay],
   );
 
-  const handleScamWarningModal = (arg: boolean) => {
-    setShowScamWarningModal(arg);
-  };
-
   const renderFooterLeft = () => {
     if (showMusdCta && musd?.convert) {
       return (
@@ -168,9 +136,8 @@ export default function TokenCell({
   }
 
   return (
-    <>
       <GenericAssetCellLayout
-        onClick={showScamWarningModal ? undefined : onClick}
+        onClick={onClick}
         badge={
           <AssetCellBadge
             chainId={token.chainId}
@@ -184,7 +151,6 @@ export default function TokenCell({
         headerRightDisplay={
           <TokenCellSecondaryDisplay
             token={displayToken}
-            handleScamWarningModal={handleScamWarningModal}
             privacyMode={privacyMode}
           />
         }
@@ -196,34 +162,5 @@ export default function TokenCell({
           />
         }
       />
-      {isEvm && showScamWarningModal && (
-        <Modal isOpen onClose={() => setShowScamWarningModal(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader onClose={() => setShowScamWarningModal(false)}>
-              {t('nativeTokenScamWarningTitle')}
-            </ModalHeader>
-            <ModalBody marginTop={4} marginBottom={4}>
-              {t('nativeTokenScamWarningDescription', [
-                token.symbol,
-                nativeCurrencySymbol ||
-                  t('nativeTokenScamWarningDescriptionExpectedTokenFallback'),
-              ])}
-            </ModalBody>
-            <ModalFooter>
-              <ButtonSecondary
-                onClick={() => {
-                  dispatch(setEditedNetwork({ chainId: token.chainId }));
-                  navigate(NETWORKS_ROUTE);
-                }}
-                block
-              >
-                {t('nativeTokenScamWarningConversion')}
-              </ButtonSecondary>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-    </>
   );
 }

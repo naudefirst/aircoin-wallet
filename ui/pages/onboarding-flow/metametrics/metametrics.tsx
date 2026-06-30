@@ -152,6 +152,15 @@ export default function OnboardingMetametrics() {
     }
   }, [completedMetaMetricsOnboarding, isOptedIn, dataCollectionForMarketing]);
 
+  // AIR Wallet: skip this screen entirely — opt out of analytics and proceed
+  useEffect(() => {
+    dispatch(setParticipateInMetaMetrics(false));
+    dispatch(setDataCollectionForMarketing(false));
+    dispatch(setPna25Acknowledged(true, true));
+    navigate(nextRouteByBrowser, { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const currentKeyring = useSelector(getCurrentKeyring);
 
   const { trackEvent } = useContext(MetaMetricsContext);

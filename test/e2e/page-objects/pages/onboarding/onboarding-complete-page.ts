@@ -10,7 +10,7 @@ class OnboardingCompletePage {
     '[data-testid="download-app-continue"]';
 
   private readonly walletReadyMessage = {
-    text: 'Your wallet is ready!',
+    text: 'Your Air Wallet is ready!',
   };
 
   private readonly keepSrpSafeMessage = {

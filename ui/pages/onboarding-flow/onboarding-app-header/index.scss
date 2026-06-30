@@ -48,7 +48,8 @@
     }
 
     &--horizontal {
-      width: 63px;
+      height: 40px;
+      width: auto;
 
       @include design-system.screen-sm-max {
         display: none;

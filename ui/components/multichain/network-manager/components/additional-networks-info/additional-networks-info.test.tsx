@@ -29,14 +29,6 @@ describe('AdditionalNetworksInfo', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('renders the component with "Additional networks" text', () => {
-    renderComponent();
-    // Using the actual text that's rendered with the real i18n context
-    expect(
-      screen.getByText(messages.additionalNetworks.message),
-    ).toBeInTheDocument();
-  });
-
   it('shows info icon', () => {
     renderComponent();
 
@@ -76,13 +68,11 @@ describe('AdditionalNetworksInfo', () => {
       screen.getByText(messages.learnMoreUpperCase.message),
     ).toBeInTheDocument();
 
-    // Trigger mouse leave on the containing box to close the popover
-    const containerBox = screen
-      .getByText(messages.additionalNetworks.message)
-      .closest('div[role="presentation"]');
+    // Trigger mouse leave on the info icon's parent container to close the popover
+    const infoIconParent = document.querySelector('.add-network__warning-icon')?.closest('div');
     await act(async () => {
-      if (containerBox) {
-        fireEvent.mouseLeave(containerBox);
+      if (infoIconParent) {
+        fireEvent.mouseLeave(infoIconParent);
       }
       // Small delay to allow the state update to complete
       await new Promise((r) => setTimeout(r, 0));

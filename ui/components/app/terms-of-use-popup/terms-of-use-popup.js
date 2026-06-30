@@ -115,19 +115,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               AND A WAIVER OF CLASS ACTION RIGHTS AS DETAILED IN SECTION 11.
               PLEASE READ THE AGREEMENT CAREFULLY.
             </Text>
-            <Text variant={TextVariant.bodySm} marginBottom={4}>
-              ConsenSys Software Inc. (“ConsenSys,” “we,” “us,” or “our”) is the
-              leading blockchain software development company. With a focus on
-              utilizing decentralized technologies, such as Ethereum, our
-              software is powering a revolution in commerce and finance and
-              helping to optimize business processes. ConsenSys hosts a top
-              level domain website, www.consensys.io, that serves information
-              regarding ConsenSys and our Offerings, as defined below, as well
-              as sub-domains for our products or services (the top level domain
-              with the sub-domains collectively referred to as the “Site”),
-              which include text, images, audio, code and other materials or
-              third party information.&nbsp;
-            </Text>
+           
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               These Terms of Use (the “Terms,” “Terms of Use” or “Agreement”)
               contain the terms and conditions that govern your access to and
@@ -141,11 +129,11 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               otherwise accessing the Offerings (the date on which any of the
               events listed above occur being the “Effective Date”), you (1)
               accept and agree to these Terms and any additional terms, rules
-              and conditions of participation issued by ConsenSys from time to
+              and conditions of participation issued by INFOCUS Technologies from time to
               time and (2) consent to the collection, use, disclosure and other
               handling of information as described in our{' '}
               <ButtonLink
-                href="https://consensys.io/privacy-policy/"
+                href="https://pages.myairdrive.com/root/aircoin-lagals/privacy.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 color={TextColor.primaryDefault}
@@ -189,9 +177,9 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               use of the Offerings.
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
-              1.2 Offerings and Access. ConsenSys offers a number of products
-              and services, each an “Offering”, under the ConsenSys brand or
-              brands owned by us. These include Codefi, Quorum, Infura, MetaMask
+              1.2 Offerings and Access. INFOCUS Technologies offers a number of products
+              and services, each an “Offering”, under the INFOCUS Technologies brand or
+              brands owned by us. These including Air Wallet
               and others. Offerings are generally accessed through the Site or
               through a third party provider of which we approved, such as the
               Google Play or Apple App Store, unless otherwise agreed in
@@ -297,10 +285,10 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               and subcontractors performing work on your behalf.
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
-              3.5 Applicability to MetaMask Offerings. For the avoidance of
+              3.5 Applicability to Air Wallet Offerings. For the avoidance of
               doubt, the terms of this Section 3 are applicable to all
-              Offerings, including MetaMask and any accounts you create through
-              MetaMask with Third Party Offerings, such as decentralized
+              Offerings, including Air Wallet and any accounts you create through
+              Air Wallet with Third Party Offerings, such as decentralized
               applications, or blockchain-based accounts themselves.
             </Text>
             <Text variant={TextVariant.bodyLgMedium} marginBottom={4}>
@@ -582,7 +570,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               (a) Subject to the limitations in this Section 8, you will defend
-              ConsenSys, its affiliates, and their respective employees,
+              INFOCUS Technologies, its affiliates, and their respective employees,
               officers, and directors against any third-party claim alleging
               that any of Your Content infringes or misappropriates that third
               party’s intellectual property rights, and will pay the amount of
@@ -656,7 +644,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               RESULT IN LOSSES IF YOUR PARTICIPATION VIOLATES CERTAIN PROTOCOL
               RULES, THAT&nbsp; BLOCKCHAIN-BASED TRANSACTIONS ARE IRREVERSIBLE,
               THAT YOUR PRIVATE KEY AND BACKUP SEED PHRASE MUST BE KEPT SECRET
-              AT ALL TIMES, THAT CONSENSYS WILL NOT STORE A BACKUP OF, NOR WILL
+              AT ALL TIMES, THAT INFOCUS Technologies WILL NOT STORE A BACKUP OF, NOR WILL
               BE ABLE TO DISCOVER OR RECOVER, YOUR PRIVATE KEY OR BACKUP SEED
               PHRASE, AND THAT YOU ARE SOLELY RESPONSIBLE FOR ANY APPROVALS OR
               PERMISSIONS YOU PROVIDE BY CRYPTOGRAPHICALLY SIGNING BLOCKCHAIN
@@ -668,28 +656,28 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               RISKS, AND CYBERSECURITY RISKS.&nbsp; YOU UNDERSTAND THAT THE COST
               AND SPEED OF A BLOCKCHAIN-BASED SYSTEM IS VARIABLE, THAT COST MAY
               INCREASE DRAMATICALLY AT ANY TIME, AND THAT COST AND SPEED IS NOT
-              WITHIN THE CAPABILITY OF CONSENSYS TO CONTROL.&nbsp; YOU
+              WITHIN THE CAPABILITY OF INFOCUS Technologies TO CONTROL.&nbsp; YOU
               UNDERSTAND THAT PROTOCOL UPGRADES MAY INADVERTENTLY CONTAIN BUGS
               OR SECURITY VULNERABILITIES THAT MAY RESULT IN LOSS OF
               FUNCTIONALITY AND ULTIMATELY FUNDS.
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
-              YOU UNDERSTAND AND ACCEPT THAT CONSENSYS DOES NOT CONTROL ANY
-              BLOCKCHAIN PROTOCOL, NOR DOES CONSENSYS CONTROL ANY SMART CONTRACT
-              THAT IS NOT OTHERWISE OFFERED BY CONSENSYS AS PART OF THE
-              OFFERINGS.&nbsp; YOU UNDERSTAND AND ACCEPT THAT CONSENSYS DOES NOT
+              YOU UNDERSTAND AND ACCEPT THAT INFOCUS Technologies DOES NOT CONTROL ANY
+              BLOCKCHAIN PROTOCOL, NOR DOES INFOCUS Technologies CONTROL ANY SMART CONTRACT
+              THAT IS NOT OTHERWISE OFFERED BY INFOCUS Technologies AS PART OF THE
+              OFFERINGS.&nbsp; YOU UNDERSTAND AND ACCEPT THAT INFOCUS Technologies DOES NOT
               CONTROL AND IS NOT RESPONSIBLE FOR THE TRANSITION OF ANY
               BLOCKCHAIN PROTOCOL FROM PROOF OF WORK TO PROOF OF STAKE
-              CONSENSUS.&nbsp; YOU AGREE THAT YOU ALONE, AND NOT CONSENSYS, IS
+              CONSENSUS.&nbsp; YOU AGREE THAT YOU ALONE, AND NOT INFOCUS Technologies, IS
               RESPONSIBLE FOR ANY TRANSACTIONS THAT YOU ENGAGE IN WITH REGARD TO
               SUPPORTING ANY BLOCKCHAIN PROTOCOL WHETHER THROUGH TRANSACTION
               VALIDATION OR OTHERWISE, OR ANY TRANSACTIONS THAT YOU ENGAGE IN
               WITHANY THIRD-PARTY-DEVELOPED SMART CONTRACT OR TOKEN, INCLUDING
               TOKENS THAT WERE CREATED BY A THIRD PARTY FOR THE PURPOSE OF
               FRAUDULENTLY MISREPRESENTING AFFILIATION WITH ANY BLOCKCHAIN
-              PROJECT.&nbsp; YOU AGREE THAT CONSENSYS IS NOT RESPONSIBLE FOR THE
+              PROJECT.&nbsp; YOU AGREE THAT INFOCUS Technologies IS NOT RESPONSIBLE FOR THE
               REGULATORY STATUS OR TREATMENT OF ANY DIGITAL ASSETS THAT YOU MAY
-              ACCESS OR TRANSACT WITH USING CONSENSYS OFFERINGS.&nbsp; YOU
+              ACCESS OR TRANSACT WITH USING INFOCUS Technologies OFFERINGS.&nbsp; YOU
               EXPRESSLY ASSUME FULL RESPONSIBILITY FOR ALL OF THE RISKS OF
               ACCESSING AND USING THE OFFERINGS TO INTERACT WITH BLOCKCHAIN
               PROTOCOLS.&nbsp;
@@ -844,7 +832,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               11.3 30-Day Right to Opt Out. You have the right to opt-out and
               not be bound by the arbitration and class action waiver provisions
               set forth above by sending written notice of your decision to
-              opt-out to the email address notices@consensys.net with subject
+              opt-out to the email address notices@INFOCUS Technologies.net with subject
               line LEGAL OPT OUT. The notice must be sent within 30 days of your
               first use of the Offerings, otherwise you shall be bound to
               arbitrate disputes and will be deemed to have agreed to waive any
@@ -874,7 +862,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               12.2 DAOs. As a blockchain native company, we may interact with
               and provide certain Offerings to DAOs. Due to the unique nature of
               DAOs, to the extent the DAO votes in favor of and/or accepts such
-              Offerings from ConsenSys, the DAO has acknowledged and agreed to
+              Offerings from INFOCUS Technologies, the DAO has acknowledged and agreed to
               these Terms in their entirety.
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
@@ -962,7 +950,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               (b) To Us. To give us notice under this Agreement, you must
-              contact us by email at notices@consensys.net.&nbsp;
+              contact us by email at notice@myairdrive.com.&nbsp;
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               12.9 No Third-Party Beneficiaries. Except as otherwise set forth
@@ -1028,7 +1016,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               You can reach us at:
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
-              Email: notices@consensys.net
+              Email: notices@myairdrive.com
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               Subject Line: Copyright Notification Mail
@@ -1037,7 +1025,7 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
               Attention: Copyright ℅
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
-              ConsenSys Software Inc.&nbsp;
+              INFOCUS Technologies Software .&nbsp;
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               49 Bogart Street Suite 22 Brooklyn, NY 11206
@@ -1132,18 +1120,18 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               “Our Marks” means any trademarks, service marks, service or trade
-              names, logos, and other designations of ConsenSys Software Inc.
+              names, logos, and other designations of INFOCUS Technologies Software ..
               and their affiliates or licensors that we may make available to
               you in connection with this Agreement.
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               “Order” means an order for Offerings executed through an order
-              form directly with ConsenSys, or through a cloud vendor, such as
+              form directly with INFOCUS Technologies, or through a cloud vendor, such as
               Amazon Web Services, Microsoft Azure, or Google Cloud.
             </Text>
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               “Offerings” means each of the products and services, including but
-              not limited to Codefi, Infura, MetaMask, Quorum and any other
+              not limited to Air Wallet and any other
               features, tools, materials, or services offered from time to time,
               by us or our affiliates.&nbsp;
             </Text>
@@ -1157,13 +1145,13 @@ export default function TermsOfUsePopup({ onClose, onAccept }) {
             <Text variant={TextVariant.bodySm} marginBottom={4}>
               “Privacy Policy” means the privacy policy located at{' '}
               <ButtonLink
-                href="https://consensys.io/privacy-policy"
+                href="https://INFOCUS Technologies.io/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
                 color={TextColor.primaryDefault}
                 variant={TextVariant.bodySm}
               >
-                https://consensys.io/privacy-policy
+                https://pages.myairdrive.com/root/aircoin-lagals/privacy.html
               </ButtonLink>{' '}
               (and any successor or related locations designated by us), as it
               may be updated by us from time to time.

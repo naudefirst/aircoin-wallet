@@ -85,7 +85,6 @@ import {
   selectIsMerklClaimingEnabled,
   selectIsMusdConversionFlowEnabled,
 } from '../../../selectors/musd';
-import { useSafeChains } from '../../../components/multichain/networks-form/use-safe-chains';
 import { useCurrentPrice } from '../hooks/useCurrentPrice';
 import { isNativeAsset, type Asset } from '../types/asset';
 // eslint-disable-next-line import-x/no-restricted-paths -- TODO(ADR-0021): route-isolation backlog
@@ -207,25 +206,6 @@ const AssetPage = ({
   const tokenFiatAmount = assetWithBalance?.fiat?.balance ?? 0;
   const tokenHexBalance = assetWithBalance?.rawBalance as string;
 
-  const shouldShowSpendingCaps = isEvm;
-  const portfolioSpendingCapsUrl = useMemo(
-    () =>
-      getPortfolioUrl(
-        '',
-        'asset_page',
-        analyticsId,
-        isMetaMetricsEnabled === true,
-        isMarketingEnabled === true,
-        selectedAccount.address,
-        'spending-caps',
-      ),
-    [
-      selectedAccount.address,
-      isMarketingEnabled,
-      isMetaMetricsEnabled,
-      analyticsId,
-    ],
-  );
 
   const networkConfigurationsByChainId = useSelector(
     getMultichainNetworkConfigurationsByChainId,
@@ -265,7 +245,6 @@ const AssetPage = ({
     assetId: bip44Asset?.assetId ?? assetId,
     rwaData,
   };
-  const { safeChains } = useSafeChains();
   const { isStockToken: checkIsStockToken, isTokenTradingOpen } = useRWAToken();
   const isStockToken = checkIsStockToken(updatedAsset);
   const isMarketClosed = isStockToken && !isTokenTradingOpen(updatedAsset);
@@ -441,7 +420,6 @@ const AssetPage = ({
               <TokenCell
                 key={`${symbol}-${address}`}
                 token={tokenWithFiatAmount as TokenWithFiatAmount}
-                safeChains={safeChains}
                 musd={ASSET_OVERVIEW_TOKEN_CELL_MUSD_OPTIONS}
               />
             )}
@@ -557,20 +535,6 @@ const AssetPage = ({
                     </Box>
                   </Box>
                 )}
-                {shouldShowSpendingCaps &&
-                  renderRow(
-                    t('spendingCaps'),
-                    <TextButton size={TextButtonSize.BodyMd} asChild>
-                      <a
-                        className="asset-page__spending-caps"
-                        href={portfolioSpendingCapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {t('editInPortfolio')}
-                      </a>
-                    </TextButton>,
-                  )}
               </Box>
             </Box>
           )}

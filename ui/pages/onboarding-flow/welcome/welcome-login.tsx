@@ -14,6 +14,7 @@ import { ThemeType } from '../../../../shared/constants/preferences';
 import { setTermsOfUseLastAgreed } from '../../../store/actions';
 import { useTheme } from '../../../hooks/useTheme';
 import { ONBOARDING_WELCOME_ROUTE } from '../../../helpers/constants/routes';
+import WalletReadyAnimation from '../creation-successful/wallet-ready-animation';
 import LoginOptions from './login-options';
 import { LOGIN_OPTION, LOGIN_TYPE, LoginOptionType, LoginType } from './types';
 
@@ -131,6 +132,9 @@ export default function WelcomeLogin({
               isTransitioning ? 'welcome-login__cta--fade-out' : ''
             }`}
           >
+            <Box className="flex justify-center">
+              <WalletReadyAnimation />
+            </Box>
             <Button
               data-testid="onboarding-create-wallet"
               variant={ButtonVariant.Primary}

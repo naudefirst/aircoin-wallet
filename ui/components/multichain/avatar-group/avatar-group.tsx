@@ -1,10 +1,10 @@
 import * as React from 'react';
 import classnames from 'clsx';
 import {
-  AvatarAccount,
   AvatarAccountSize,
   AvatarAccountVariant,
 } from '@metamask/design-system-react';
+import { PreferredAvatar } from '../../app/preferred-avatar';
 import { Text } from '../../component-library/text';
 import {
   AlignItems,
@@ -78,10 +78,9 @@ export const AvatarGroup = ({
                 />
               )}
               {avatarType === AvatarType.ACCOUNT && (
-                <AvatarAccount
+                <PreferredAvatar
                   size={AvatarAccountSize.Xs}
                   address={member.avatarValue}
-                  variant={variant}
                 />
               )}
               {avatarType === AvatarType.NETWORK && (

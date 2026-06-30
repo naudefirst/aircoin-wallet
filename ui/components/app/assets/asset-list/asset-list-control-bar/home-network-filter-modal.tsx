@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { EthScope } from '@metamask/keyring-api';
-import { type AddNetworkFields } from '@metamask/network-controller';
 import { type MultichainNetworkConfiguration } from '@metamask/multichain-network-controller';
 import { type CaipChainId } from '@metamask/utils';
 import {
@@ -19,16 +18,10 @@ import {
   TextVariant,
 } from '@metamask/design-system-react';
 import {
-  CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP,
-  FEATURED_RPCS,
-} from '../../../../../../shared/constants/network';
-import {
   convertCaipToHexChainId,
-  getFilteredFeaturedNetworks,
   getNetworkIcon,
   sortNetworks,
 } from '../../../../../../shared/lib/network.utils';
-import { isEvmChainId } from '../../../../../../shared/lib/asset-utils';
 import {
   Icon,
   IconName,
@@ -42,20 +35,16 @@ import {
 import { useI18nContext } from '../../../../../hooks/useI18nContext';
 import { NETWORKS_ROUTE } from '../../../../../helpers/constants/routes';
 import {
-  addNetwork,
   setEnabledAllPopularNetworks,
 } from '../../../../../store/actions';
 import {
   getAllEnabledNetworksForAllNamespaces,
-  getMultichainNetworkConfigurationsByChainId,
 } from '../../../../../selectors/multichain/networks';
 import {
   getOrderedNetworksList,
-  getShowTestNetworks,
   getUseExternalServices,
 } from '../../../../../selectors';
 import { getInternalAccountBySelectedAccountGroupAndCaip } from '../../../../../selectors/multichain-accounts/account-tree';
-import { selectAdditionalNetworksBlacklistFeatureFlag } from '../../../../../selectors/network-blacklist/network-blacklist';
 import { useNetworkManagerState } from '../../../../multichain/network-manager/hooks/useNetworkManagerState';
 import { useNetworkChangeHandlers } from '../../../../multichain/network-manager/hooks/useNetworkChangeHandlers';
 import { NetworkListItem } from '../../../../multichain/network-list-item';
@@ -278,15 +267,8 @@ const HomeNetworkFilterModalContent = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const orderedNetworksList = useSelector(getOrderedNetworksList);
-  const [, evmNetworks] = useSelector(
-    getMultichainNetworkConfigurationsByChainId,
-  );
   const enabledNetworks = useSelector(getAllEnabledNetworksForAllNamespaces);
   const useExternalServices = useSelector(getUseExternalServices);
-  const showTestnets = useSelector(getShowTestNetworks);
-  const blacklistedChainIds = useSelector(
-    selectAdditionalNetworksBlacklistFeatureFlag,
-  );
   const evmAccountGroup = useSelector((state) =>
     getInternalAccountBySelectedAccountGroupAndCaip(state, EthScope.Eoa),
   );
@@ -295,7 +277,7 @@ const HomeNetworkFilterModalContent = ({
     nonTestNetworks: allDefaultNetworkMap,
     isNetworkInDefaultNetworkTab,
   } = useNetworkManagerState({ showDefaultNetworks: true });
-  const { nonTestNetworks: customNetworkMap, testNetworks: testNetworkMap } =
+  const { nonTestNetworks: customNetworkMap } =
     useNetworkManagerState();
 
   const enabledNetworkSet = useMemo(
@@ -340,26 +322,6 @@ const HomeNetworkFilterModalContent = ({
     );
   }, [customNetworkMap, orderedNetworksList, useExternalServices]);
 
-  const testNetworks = useMemo(() => {
-    return sortNetworks(testNetworkMap, orderedNetworksList).filter(
-      (network) => useExternalServices || network.isEvm,
-    );
-  }, [orderedNetworksList, testNetworkMap, useExternalServices]);
-
-  const additionalNetworks = useMemo(() => {
-    const availableNetworks = FEATURED_RPCS.filter(
-      ({ chainId }) => !evmNetworks[chainId],
-    ).filter(
-      ({ chainId }) =>
-        useExternalServices || isEvmChainId(chainId as CaipChainId),
-    );
-
-    return getFilteredFeaturedNetworks(
-      blacklistedChainIds,
-      availableNetworks,
-    ).sort((a, b) => a.name.localeCompare(b.name));
-  }, [blacklistedChainIds, evmNetworks, useExternalServices]);
-
   const handleSelectAllDefaultNetworks = useCallback(() => {
     dispatch(setEnabledAllPopularNetworks());
     onClose();
@@ -371,14 +333,6 @@ const HomeNetworkFilterModalContent = ({
       onClose();
     },
     [handleNetworkChange, onClose],
-  );
-
-  const handleAddNetwork = useCallback(
-    async (network: AddNetworkFields) => {
-      await dispatch(addNetwork(network));
-      onClose();
-    },
-    [dispatch, onClose],
   );
 
   const handleManageNetworks = useCallback(() => {
@@ -419,52 +373,13 @@ const HomeNetworkFilterModalContent = ({
       });
     }
 
-    if (showTestnets && testNetworks.length > 0) {
-      nextSections.push({
-        key: 'test-networks',
-        title: t('testnets'),
-        items: testNetworks.map((network) => ({
-          key: network.chainId,
-          name: network.name,
-          iconSrc: getNetworkIcon(network),
-          chainId: getSelectableChainId(network),
-          selected: isNetworkSelected(network),
-          onClick: () => handleSelectNetwork(network.chainId),
-          testId: `home-network-filter-test-${getSelectableChainId(network)}`,
-        })),
-      });
-    }
-
-    if (additionalNetworks.length > 0) {
-      nextSections.push({
-        key: 'additional-networks',
-        title: t('additionalNetworks'),
-        items: additionalNetworks.map((network) => ({
-          key: network.chainId,
-          name: network.name,
-          iconSrc:
-            CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP[
-              network.chainId as keyof typeof CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP
-            ],
-          chainId: network.chainId,
-          endIconName: IconName.Add,
-          onClick: () => handleAddNetwork(network),
-          testId: `home-network-filter-additional-${network.chainId}`,
-        })),
-      });
-    }
-
     return nextSections;
   }, [
-    additionalNetworks,
     customNetworks,
     defaultNetworks,
-    handleAddNetwork,
     handleSelectNetwork,
     isNetworkSelected,
-    showTestnets,
     t,
-    testNetworks,
   ]);
 
   return (

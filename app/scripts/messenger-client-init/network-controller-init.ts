@@ -90,6 +90,24 @@ function getInitialState(initialState?: Partial<NetworkController['state']>) {
     // Users can add it manually, and it will be available in FEATURED_RPCS
     delete networks[CHAIN_IDS.SEI];
 
+    // Add AirCoin network (chain ID 1515 / 0x5eb)
+    networks[CHAIN_IDS.AIRCOIN] = {
+      chainId: CHAIN_IDS.AIRCOIN,
+      name: 'AirCoin',
+      nativeCurrency: 'AIR',
+      blockExplorerUrls: ['https://scout.myaircoins.com'],
+      defaultBlockExplorerUrlIndex: 0,
+      defaultRpcEndpointIndex: 0,
+      rpcEndpoints: [
+        {
+          networkClientId: 'aircoin-mainnet',
+          url: 'https://rpc.myaircoins.com',
+          type: RpcEndpointType.Custom,
+          failoverUrls: [],
+        },
+      ],
+    };
+
     let network: NetworkConfiguration;
     if (process.env.IN_TEST) {
       network = {
@@ -108,13 +126,10 @@ function getInitialState(initialState?: Partial<NetworkController['state']>) {
         ],
       };
       networks[CHAIN_IDS.LOCALHOST] = network;
-    } else if (
-      process.env.METAMASK_DEBUG ||
-      process.env.METAMASK_ENVIRONMENT === 'test'
-    ) {
+    } else if (process.env.METAMASK_ENVIRONMENT === 'test') {
       network = networks[CHAIN_IDS.SEPOLIA];
     } else {
-      network = networks[CHAIN_IDS.MAINNET];
+      network = networks[CHAIN_IDS.AIRCOIN];
     }
 
     initialNetworkControllerState.selectedNetworkClientId =

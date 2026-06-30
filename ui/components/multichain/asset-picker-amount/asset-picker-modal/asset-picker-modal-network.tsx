@@ -43,7 +43,6 @@ import { formatCurrency } from '../../../../helpers/utils/confirm-tx.util';
 import { useMultichainBalances } from '../../../../hooks/useMultichainBalances';
 import { NETWORK_TO_SHORT_NETWORK_NAME_MAP } from '../../../../../shared/constants/bridge';
 import { getImageForChainId } from '../../../../selectors/multichain';
-import { getShowTestNetworks } from '../../../../selectors/selectors';
 import { getNetworkSections } from '../../../../helpers/utils/network-sections';
 
 // TODO use MultichainNetworkConfiguration type
@@ -101,7 +100,6 @@ export const AssetPickerModalNetwork = ({
   const { balanceByChainId } = useMultichainBalances();
 
   const allNetworks = useSelector(getNetworkConfigurationsByChainId);
-  const showTestnets = useSelector(getShowTestNetworks);
   const currency = useSelector(getCurrentCurrency);
   // Use the networks prop if it is provided, otherwise use all available networks
   // Sort the networks by balance in descending order
@@ -120,8 +118,8 @@ export const AssetPickerModalNetwork = ({
         (networkA, networkB) =>
           (balanceByChainId[networkB.chainId] ?? 0) -
           (balanceByChainId[networkA.chainId] ?? 0),
-      ).filter((section) => showTestnets || section.key !== 'test'),
-    [balanceByChainId, networksList, showTestnets],
+      ).filter((section) => section.key !== 'test'),
+    [balanceByChainId, networksList],
   );
   // Tracks the selection/checked state of each network
   // Initialized with the selectedChainIds if provided

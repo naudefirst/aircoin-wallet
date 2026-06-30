@@ -61,6 +61,9 @@ export const useNetworkManagerState = ({
           const isFeaturedRpc = FEATURED_RPCS.some(
             (featuredRpc) => featuredRpc.chainId === hexChainId,
           );
+          const isFeaturedNetworkChain = FEATURED_NETWORK_CHAIN_IDS.includes(
+            hexChainId as Hex,
+          );
 
           const isMultichainProviderConfig = Object.values(
             MultichainNetworks,
@@ -73,7 +76,10 @@ export const useNetworkManagerState = ({
           );
 
           const shouldInclude =
-            !isBuiltInNetwork && !isFeaturedRpc && !isMultichainProviderConfig;
+            !isBuiltInNetwork &&
+            !isFeaturedRpc &&
+            !isFeaturedNetworkChain &&
+            !isMultichainProviderConfig;
 
           if (shouldInclude || isTest) {
             (isTest ? testnetsList : nonTestnetsList)[chainId] = network;

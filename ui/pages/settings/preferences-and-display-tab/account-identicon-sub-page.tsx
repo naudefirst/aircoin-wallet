@@ -22,7 +22,34 @@ import { PREFERENCES_AND_DISPLAY_ROUTE } from '../../../helpers/constants/routes
 import { getPreferences } from '../../../../shared/lib/selectors/preferences';
 import { getSelectedInternalAccount } from '../../../../shared/lib/selectors/accounts';
 import { useI18nContext } from '../../../hooks/useI18nContext';
-import { AVATAR_OPTIONS } from './account-identicon-utils';
+import { PolyconAvatar } from '../../../components/app/polycon-avatar';
+import {
+  AVATAR_OPTIONS,
+  AIR_AVATAR_POLYCONS,
+  type AirAvatarType,
+} from './account-identicon-utils';
+
+/** Renders the live avatar preview for a given option in the picker. */
+const AvatarPreview = ({
+  value,
+  address,
+}: {
+  value: AirAvatarType;
+  address?: string;
+}) => {
+  if (value === AIR_AVATAR_POLYCONS) {
+    return (
+      <PolyconAvatar address={address} size={AvatarAccountSize.Md} />
+    );
+  }
+  return (
+    <AvatarAccount
+      address={address}
+      variant={value as AvatarAccountVariant}
+      size={AvatarAccountSize.Md}
+    />
+  );
+};
 
 const AccountIdenticonSubPage = () => {
   const dispatch = useDispatch();
@@ -31,10 +58,9 @@ const AccountIdenticonSubPage = () => {
   const { avatarType } = useSelector(getPreferences);
   const selectedAccount = useSelector(getSelectedInternalAccount);
 
-  const currentVariant: AvatarAccountVariant =
-    avatarType ?? AvatarAccountVariant.Maskicon;
+  const currentVariant: AirAvatarType = avatarType ?? AIR_AVATAR_POLYCONS;
 
-  const handleSelect = (value: AvatarAccountVariant) => {
+  const handleSelect = (value: AirAvatarType) => {
     dispatch(setAvatarType(value));
     navigate(PREFERENCES_AND_DISPLAY_ROUTE);
   };
@@ -62,10 +88,9 @@ const AccountIdenticonSubPage = () => {
               alignItems={BoxAlignItems.Center}
               gap={3}
             >
-              <AvatarAccount
+              <AvatarPreview
+                value={value}
                 address={selectedAccount?.address}
-                variant={value}
-                size={AvatarAccountSize.Md}
               />
               <Text variant={TextVariant.BodyMd} fontWeight={FontWeight.Medium}>
                 {t(labelKey)}

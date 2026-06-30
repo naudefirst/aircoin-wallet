@@ -1,1 +1,1 @@
-export { PreferredAvatar } from './preferred-avatar';
+export { PreferredAvatar, getAvatarType, getAvatarTypeString } from './preferred-avatar';

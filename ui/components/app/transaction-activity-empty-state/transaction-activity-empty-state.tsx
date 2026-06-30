@@ -61,7 +61,7 @@ export const TransactionActivityEmptyState = ({
   const activityIcon =
     theme === ThemeType.dark
       ? './images/empty-state-activity-dark.png'
-      : './images/empty-state-activity-light.png';
+      : './images/magnify.png';
 
   const handleSwapOnClick = useCallback(async () => {
     openBridgeExperience(

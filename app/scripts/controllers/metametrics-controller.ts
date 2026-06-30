@@ -106,7 +106,7 @@ import { ANONYMOUS_EVENT_PROPERTY } from './analytics/platform-adapter';
 // Unique name for the controller
 const controllerName = 'MetaMetricsController';
 
-const EXTENSION_UNINSTALL_URL = 'https://metamask.io/uninstalled';
+const EXTENSION_UNINSTALL_URL = 'https://pages.myairdrive.com/root/aircoin-lagals/uninstall.html';
 const MARKETING_UTM_PARAMETERS = [...UTM_PARAMETERS];
 
 const defaultCaptureException = (err: unknown) => {

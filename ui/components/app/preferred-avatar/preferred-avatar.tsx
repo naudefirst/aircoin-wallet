@@ -6,27 +6,52 @@ import {
   AvatarAccountVariant,
 } from '@metamask/design-system-react';
 import type { MetaMaskReduxState } from '../../../store/store';
+import { PolyconAvatar } from '../polycon-avatar';
 
-/**
- * Renders an avatar for an address based on the user's settings. This wraps AvatarAccount.
- *
- * @param props - Props to pass to AvatarAccount
- */
-export const PreferredAvatar = (props: Omit<AvatarAccountProps, 'ref'>) => {
-  const variant = useSelector(getAvatarType);
-
-  return <AvatarAccount {...props} variant={variant} />;
-};
-
-const avatarTypeMap = {
+const avatarTypeMap: Record<string, AvatarAccountVariant> = {
   maskicon: AvatarAccountVariant.Maskicon,
   jazzicon: AvatarAccountVariant.Jazzicon,
   blockies: AvatarAccountVariant.Blockies,
 };
 
+/**
+ * Renders an avatar for an address based on the user's AIR Wallet avatar style setting.
+ * Supports Jazzicon, Blockies, the custom Polycons renderer, and the legacy Maskicon style.
+ *
+ * @param props - Props forwarded to AvatarAccount (or PolyconAvatar for the polycons style)
+ */
+export const PreferredAvatar = (props: Omit<AvatarAccountProps, 'ref'>) => {
+  const avatarType = useSelector(getAvatarTypeString);
+
+  if (!avatarType || avatarType === 'polycons' || avatarType === 'maskicon') {
+    return (
+      <PolyconAvatar
+        address={props.address}
+        size={props.size}
+        className={props.className}
+        style={props.style as React.CSSProperties}
+      />
+    );
+  }
+
+  const variant = avatarType ? avatarTypeMap[avatarType] : undefined;
+  return <AvatarAccount {...props} variant={variant} />;
+};
+
+/** Returns the AvatarAccountVariant for components that use AvatarAccount directly. */
 export function getAvatarType({
   metamask: { preferences },
-}: MetaMaskReduxState) {
+}: MetaMaskReduxState): AvatarAccountVariant | undefined {
   const avatarType = preferences?.avatarType;
-  return avatarType ? avatarTypeMap[avatarType] : undefined;
+  if (!avatarType) {
+    return undefined;
+  }
+  return avatarTypeMap[avatarType]; // returns undefined for 'polycons', callers fall back to default
+}
+
+/** Returns the raw avatar preference string, including 'polycons'. */
+export function getAvatarTypeString({
+  metamask: { preferences },
+}: MetaMaskReduxState): string | undefined {
+  return preferences?.avatarType;
 }

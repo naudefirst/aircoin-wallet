@@ -46,7 +46,6 @@ import {
   MetaMetricsEventName,
 } from '../../../../../shared/constants/metametrics';
 import { MetaMetricsContext } from '../../../../contexts/metametrics';
-import { SafeChain } from '../../../multichain/networks-form/use-safe-chains';
 import {
   isEvmChainId,
   isTronSpecialAsset,
@@ -59,7 +58,6 @@ import { useI18nContext } from '../../../../hooks/useI18nContext';
 
 type TokenListProps = {
   onTokenClick: (chainId: string, address: string) => void;
-  safeChains?: SafeChain[];
 };
 
 type TokenListDisplayItem =
@@ -189,7 +187,7 @@ const LowValueAssetsToggle = ({
 
 // TODO: Fix in https://github.com/MetaMask/metamask-extension/issues/31860
 // eslint-disable-next-line @typescript-eslint/naming-convention
-function TokenList({ onTokenClick, safeChains }: TokenListProps) {
+function TokenList({ onTokenClick }: TokenListProps) {
   const isEvm = useSelector(getIsEvmMultichainNetworkSelected);
   const currentNetwork = useSelector(getSelectedMultichainNetworkConfiguration);
   const { privacyMode } = useSelector(getPreferences);
@@ -391,7 +389,6 @@ function TokenList({ onTokenClick, safeChains }: TokenListProps) {
         token={token}
         privacyMode={privacyMode}
         onClick={isNonEvmTestnet ? undefined : handleTokenClick(token)}
-        safeChains={safeChains}
         musd={TOKEN_LIST_CELL_MUSD_OPTIONS}
       />
     );

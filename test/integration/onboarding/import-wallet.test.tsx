@@ -87,7 +87,7 @@ describe('Import Wallet Events', () => {
       backgroundConnection: backgroundConnectionMocked,
     });
 
-    await waitForElementByText('Your wallet is ready!');
+    await waitForElementByText('Your Air Wallet is ready!');
     await clickElementById('onboarding-complete-done');
 
     // Verify both completeOnboarding and ExtensionPinned event are called

@@ -72,10 +72,6 @@ const PopularNetworkList = ({
         justifyContent={JustifyContent.spaceBetween}
       >
         <Box display={Display.InlineFlex}>
-          <Text color={TextColor.textAlternative} variant={TextVariant.bodyMd}>
-            {t('additionalNetworks')}
-          </Text>
-
           <Box
             display={Display.Flex}
             alignItems={AlignItems.center}

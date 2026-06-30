@@ -10,7 +10,7 @@ import MockedPage from '../../page-objects/pages/mocked-page';
 describe('Portfolio site', function () {
   async function mockPortfolioSite(mockServer: MockttpServer) {
     return await mockServer
-      .forGet('https://app.metamask.io/explore/tokens')
+      .forGet('https://scout.myaircoins.com')
       .withQuery({
         metamaskEntry: 'ext_portfolio_button',
         metametricsId: MOCK_ANALYTICS_ID,

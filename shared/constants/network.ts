@@ -228,6 +228,7 @@ export const CHAIN_IDS = {
   STABLE_MAINNET: '0x3dc',
   MANTLE: '0x1388',
   ARC: '0x13b2',
+  AIRCOIN: '0x5eb',
 } as const;
 
 export const CHAINLIST_CHAIN_IDS_MAP = {
@@ -596,6 +597,7 @@ export const CHAINLIST_CURRENCY_SYMBOLS_MAP_NETWORK_COLLISION = {
   HYPE: 'HYPE',
 };
 
+export const AIRCOIN_TOKEN_IMAGE_URL = './images/logo/aircoin-logo.png';
 export const ETH_TOKEN_IMAGE_URL = './images/eth_logo.svg';
 export const LINEA_GOERLI_TOKEN_IMAGE_URL = './images/linea-logo-testnet.png';
 export const LINEA_SEPOLIA_TOKEN_IMAGE_URL = './images/linea-logo-testnet.png';
@@ -1161,6 +1163,7 @@ export const CHAIN_ID_TO_RPC_URL_MAP = {
 } as const;
 
 export const CHAIN_ID_TO_NETWORK_IMAGE_URL_MAP: Record<string, string> = {
+  [CHAIN_IDS.AIRCOIN]: AIRCOIN_TOKEN_IMAGE_URL,
   [CHAIN_IDS.MAINNET]: ETH_TOKEN_IMAGE_URL,
   [CHAIN_IDS.LINEA_GOERLI]: LINEA_GOERLI_TOKEN_IMAGE_URL,
   [CHAIN_IDS.LINEA_SEPOLIA]: LINEA_SEPOLIA_TOKEN_IMAGE_URL,
@@ -1779,6 +1782,7 @@ export const FEATURED_RPCS: AddNetworkFields[] = [
 ];
 
 export const FEATURED_NETWORK_CHAIN_IDS = [
+  CHAIN_IDS.AIRCOIN,
   CHAIN_IDS.MAINNET,
   ...FEATURED_RPCS.map((rpc) => rpc.chainId),
 ];
@@ -1787,6 +1791,7 @@ export const FEATURED_NETWORK_CHAIN_IDS_MULTICHAIN = [
   SolScope.Mainnet,
   BtcScope.Mainnet,
   TrxScope.Mainnet,
+  CHAIN_IDS.AIRCOIN,
   CHAIN_IDS.MAINNET,
   ...FEATURED_RPCS.map((rpc) => rpc.chainId),
 ];

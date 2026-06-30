@@ -32,7 +32,6 @@ import {
   getOrderedNetworksList,
   getOriginOfCurrentTab,
   getPermittedEVMChainsForSelectedTab,
-  getShowTestNetworks,
   getAllChainsToPoll,
 } from '../../../selectors';
 import { getPreferences } from '../../../../shared/lib/selectors/preferences';
@@ -42,7 +41,6 @@ import {
   setActiveNetwork,
   setNetworkClientIdForDomain,
   setNextNonce,
-  setShowTestNetworks,
   setTokenNetworkFilter,
   showPermittedNetworkToast,
   updateCustomNonce,
@@ -91,7 +89,6 @@ export const DappBarEVMNetworkSelectorPopover: React.FC<
   const selectedTabOrigin = useSelector(getOriginOfCurrentTab);
   const domains = useSelector(getAllDomains);
   const orderedNetworksList = useSelector(getOrderedNetworksList);
-  const showTestnets = useSelector(getShowTestNetworks);
   const dappActiveNetwork = useSelector(getDappActiveNetwork);
   const [multichainNetworks, evmNetworks] = useSelector(
     getMultichainNetworkConfigurationsByChainId,
@@ -106,20 +103,20 @@ export const DappBarEVMNetworkSelectorPopover: React.FC<
     ? (dappActiveNetwork.chainId as Hex)
     : undefined;
 
-  // Partition into EVM non-test vs EVM test networks. Non-EVM is intentionally
-  // excluded: the dapp control bar is EVM-scoped today.
-  const [nonTestEvmNetworks, testEvmNetworks] = useMemo(() => {
+  // Only EVM non-test networks. Non-EVM is intentionally excluded: the dapp
+  // control bar is EVM-scoped today.
+  const nonTestEvmNetworks = useMemo(() => {
     const nonTest: MultichainNetworkConfiguration[] = [];
-    const test: MultichainNetworkConfiguration[] = [];
     for (const network of Object.values(multichainNetworks)) {
       if (!network.isEvm) {
         continue;
       }
       const hexChainId = convertCaipToHexChainId(network.chainId);
-      const isTest = TEST_CHAINS.includes(hexChainId as Hex);
-      (isTest ? test : nonTest).push(network);
+      if (!TEST_CHAINS.includes(hexChainId as Hex)) {
+        nonTest.push(network);
+      }
     }
-    return [nonTest, test];
+    return nonTest;
   }, [multichainNetworks]);
 
   // Keyed record expected by sortNetworks (keyed by hex chainId for EVM).
@@ -136,20 +133,6 @@ export const DappBarEVMNetworkSelectorPopover: React.FC<
     () => sortNetworks(nonTestEvmNetworksByKey, orderedNetworksList),
     [nonTestEvmNetworksByKey, orderedNetworksList],
   );
-
-  const currentlyOnTestnet = activeDappChainId
-    ? TEST_CHAINS.includes(activeDappChainId)
-    : false;
-
-  // Only include test networks when the global "Show test networks" toggle is
-  // on, or when the dapp is already on a testnet (so the user can see the
-  // current selection).
-  const visibleNetworks = useMemo(() => {
-    if (showTestnets || currentlyOnTestnet) {
-      return [...orderedNetworks, ...testEvmNetworks];
-    }
-    return orderedNetworks;
-  }, [orderedNetworks, testEvmNetworks, showTestnets, currentlyOnTestnet]);
 
   const handleSelectNetwork = useCallback(
     async (network: MultichainNetworkConfiguration) => {
@@ -231,24 +214,6 @@ export const DappBarEVMNetworkSelectorPopover: React.FC<
     ],
   );
 
-  const handleToggleTestNetworks = useCallback(
-    (currentValue: boolean) => {
-      // Don't allow disabling while actively on a testnet - mirrors the
-      // network-list-menu behavior so the user can't hide their own selection.
-      if (currentlyOnTestnet) {
-        return;
-      }
-      const newValue = !currentValue;
-      dispatch(setShowTestNetworks(newValue));
-      trackEvent({
-        event: MetaMetricsEventName.TestNetworksDisplayed,
-        category: MetaMetricsEventCategory.Network,
-        properties: { value: newValue },
-      });
-    },
-    [dispatch, trackEvent, currentlyOnTestnet],
-  );
-
   return (
     <Popover
       referenceElement={referenceElement}
@@ -271,35 +236,6 @@ export const DappBarEVMNetworkSelectorPopover: React.FC<
         className="w-full"
         style={{ maxHeight: `${POPOVER_MAX_HEIGHT}px` }}
       >
-        {/* Sticky header: compact test-networks toggle. Stays in view while the
-            network list below scrolls. */}
-        <Box
-          flexDirection={BoxFlexDirection.Row}
-          alignItems={BoxAlignItems.Center}
-          justifyContent={BoxJustifyContent.Between}
-          gap={2}
-          paddingTop={2}
-          paddingBottom={2}
-          paddingLeft={4}
-          borderColor={BoxBorderColor.BorderMuted}
-          className="shrink-0 border-x-0 border-t-0 border-b"
-          data-testid="dapp-bar-network-selector-popover__testnet-toggle-row"
-        >
-          <Text
-            variant={TextVariant.BodySm}
-            fontWeight={FontWeight.Medium}
-            color={TextColor.TextAlternative}
-          >
-            {t('showTestnetNetworks')}
-          </Text>
-          <ToggleButton
-            dataTestId="dapp-bar-network-selector-popover__testnet-toggle"
-            value={showTestnets || currentlyOnTestnet}
-            disabled={currentlyOnTestnet}
-            onToggle={handleToggleTestNetworks}
-          />
-        </Box>
-
         <Box
           flexDirection={BoxFlexDirection.Column}
           alignItems={BoxAlignItems.Stretch}
@@ -308,7 +244,7 @@ export const DappBarEVMNetworkSelectorPopover: React.FC<
           className="w-full grow basis-auto overflow-y-auto"
           data-testid="dapp-bar-network-selector-popover__list"
         >
-          {visibleNetworks.map((network) => {
+          {orderedNetworks.map((network) => {
             const isSelected =
               convertCaipToHexChainId(network.chainId) === activeDappChainId;
             return (

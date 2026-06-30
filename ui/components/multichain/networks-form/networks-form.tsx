@@ -130,6 +130,8 @@ export const NetworksForm = ({
       ? undefined
       : rpcUrls.rpcEndpoints[rpcUrls.defaultRpcEndpointIndex];
 
+  const isAirCoin = existingNetwork?.chainId === CHAIN_IDS.AIRCOIN;
+
   const { safeChains } = useSafeChains();
 
   const [errors, setErrors] = useState<
@@ -140,8 +142,6 @@ export const NetworksForm = ({
     Record<string, { key: string; msg: string } | undefined>
   >({});
 
-  const [suggestedName, setSuggestedName] = useState<string>();
-  const [suggestedTicker, setSuggestedTicker] = useState<string>();
   const [fetchedChainId, setFetchedChainId] = useState<string>();
 
   const tokenNetworkFilter = useSelector(getTokenNetworkFilter);
@@ -151,61 +151,8 @@ export const NetworksForm = ({
       ? endpoint.replace('{infuraProjectId}', infuraProjectId ?? '')
       : endpoint;
 
-  // Validate the network name when it changes
-  useEffect(() => {
-    const chainIdHex = chainId ? toHex(chainId) : undefined;
-    const expectedName = chainIdHex
-      ? (NETWORK_TO_NAME_MAP[chainIdHex as keyof typeof NETWORK_TO_NAME_MAP] ??
-        NETWORKS_BYPASSING_VALIDATION[
-          chainIdHex as keyof typeof NETWORKS_BYPASSING_VALIDATION
-        ]?.name ??
-        safeChains?.find((chain) => toHex(chain.chainId) === chainIdHex)?.name)
-      : undefined;
-
-    const mismatch = expectedName && expectedName !== name;
-    setSuggestedName(mismatch ? expectedName : undefined);
-    setWarnings((state) => ({
-      ...state,
-      name: mismatch
-        ? {
-            key: 'wrongNetworkName',
-            msg: t('wrongNetworkName'),
-          }
-        : undefined,
-    }));
-  }, [chainId, name, safeChains]);
 
   // Validate the ticker when it changes
-  useEffect(() => {
-    const chainIdHex = chainId ? toHex(chainId) : undefined;
-    const expectedSymbol = chainIdHex
-      ? (CHAIN_ID_TO_CURRENCY_SYMBOL_MAP[
-          chainIdHex as keyof typeof CHAIN_ID_TO_CURRENCY_SYMBOL_MAP
-        ] ??
-        safeChains?.find((chain) => toHex(chain.chainId) === chainIdHex)
-          ?.nativeCurrency?.symbol)
-      : undefined;
-
-    const isWhitelistedSymbol = chainIdHex
-      ? NETWORKS_BYPASSING_VALIDATION[
-          chainIdHex as keyof typeof NETWORKS_BYPASSING_VALIDATION
-        ]?.symbol?.toLowerCase() === ticker?.toLowerCase()
-      : false;
-
-    const mismatch =
-      expectedSymbol && expectedSymbol !== ticker && !isWhitelistedSymbol;
-
-    setSuggestedTicker(mismatch ? expectedSymbol : undefined);
-    setWarnings((state) => ({
-      ...state,
-      ticker: mismatch
-        ? {
-            key: 'chainListReturnedDifferentTickerSymbol',
-            msg: t('chainListReturnedDifferentTickerSymbol'),
-          }
-        : undefined,
-    }));
-  }, [chainId, ticker, safeChains]);
 
   // Validate the chain ID when it changes
   useEffect(() => {
@@ -437,6 +384,7 @@ export const NetworksForm = ({
   };
 
   const isSaveDisabled =
+    isAirCoin ||
     !name ||
     !chainId ||
     !ticker ||
@@ -465,46 +413,6 @@ export const NetworksForm = ({
           placeholder={t('enterNetworkName')}
           data-testid="network-form-name-input"
           autoFocus
-          helpText={
-            // TODO: Fix in https://github.com/MetaMask/metamask-extension/issues/31880
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            ((name && warnings?.name?.msg) || suggestedName) && (
-              <>
-                {name && warnings?.name?.msg && (
-                  <HelpText
-                    variant={TextVariant.bodySm}
-                    severity={HelpTextSeverity.Warning}
-                  >
-                    {warnings.name.msg}
-                  </HelpText>
-                )}
-
-                {suggestedName && (
-                  <Text
-                    as="span"
-                    variant={TextVariant.bodySm}
-                    color={TextColor.textDefault}
-                    data-testid="network-form-name-suggestion"
-                  >
-                    {t('suggestedTokenName')}
-                    <ButtonLink
-                      as="button"
-                      variant={TextVariant.bodySm}
-                      color={TextColor.primaryDefault}
-                      onClick={() => {
-                        setName(suggestedName);
-                      }}
-                      paddingLeft={1}
-                      paddingRight={1}
-                      style={{ verticalAlign: 'baseline' }}
-                    >
-                      {suggestedName}
-                    </ButtonLink>
-                  </Text>
-                )}
-              </>
-            )
-          }
           // TODO: Fix in https://github.com/MetaMask/metamask-extension/issues/31973
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onChange={(e: any) => {
@@ -522,6 +430,7 @@ export const NetworksForm = ({
             'data-testid': 'network-form-network-name',
           }}
           value={name}
+          disabled={isAirCoin}
         />
         <DropdownEditor
           title={t('defaultRpcUrl')}
@@ -532,6 +441,7 @@ export const NetworksForm = ({
           selectedItemIndex={rpcUrls.defaultRpcEndpointIndex}
           error={Boolean(errors.rpcUrl)}
           buttonDataTestId="test-add-rpc-drop-down"
+          readOnly={isAirCoin}
           renderItem={(item, isList) =>
             // TODO: Fix in https://github.com/MetaMask/metamask-extension/issues/31880
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -682,31 +592,6 @@ export const NetworksForm = ({
           placeholder={t('enterSymbol')}
           paddingTop={4}
           data-testid="network-form-ticker"
-          helpText={
-            suggestedTicker ? (
-              <Text
-                as="span"
-                variant={TextVariant.bodySm}
-                color={TextColor.textDefault}
-                data-testid="network-form-ticker-suggestion"
-              >
-                {t('suggestedCurrencySymbol')}
-                <ButtonLink
-                  as="button"
-                  variant={TextVariant.bodySm}
-                  color={TextColor.primaryDefault}
-                  onClick={() => {
-                    setTicker(suggestedTicker);
-                  }}
-                  paddingLeft={1}
-                  paddingRight={1}
-                  style={{ verticalAlign: 'baseline' }}
-                >
-                  {suggestedTicker}
-                </ButtonLink>
-              </Text>
-            ) : null
-          }
           // TODO: Fix in https://github.com/MetaMask/metamask-extension/issues/31973
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onChange={(e: any) => {
@@ -724,16 +609,8 @@ export const NetworksForm = ({
             'data-testid': 'network-form-ticker-input',
           }}
           value={ticker}
+          disabled={isAirCoin}
         />
-        {ticker && warnings.ticker?.msg ? (
-          <HelpText
-            variant={TextVariant.bodySm}
-            severity={HelpTextSeverity.Warning}
-            data-testid="network-form-ticker-warning"
-          >
-            {warnings.ticker.msg}
-          </HelpText>
-        ) : null}
 
         <DropdownEditor
           title={t('blockExplorerUrl')}
@@ -745,6 +622,7 @@ export const NetworksForm = ({
           addButtonText={t('addBlockExplorerUrl')}
           onItemAdd={onBlockExplorerAdd}
           buttonDataTestId="test-explorer-drop-down"
+          readOnly={isAirCoin}
           onItemSelected={(index) =>
             setBlockExplorers((state) => ({
               ...state,

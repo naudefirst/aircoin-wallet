@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classnames from 'clsx';
 import { Box } from '../../component-library';
 import { BackgroundColor } from '../../../helpers/constants/design-system';
-import MetaFoxHorizontalLogo from './horizontal-logo';
 
 export default class MetaFoxLogo extends PureComponent {
   static propTypes = {
@@ -23,23 +22,24 @@ export default class MetaFoxLogo extends PureComponent {
   };
 
   render() {
-    const { onClick, unsetIconHeight, isOnboarding, src, theme } = this.props;
+    const { onClick, unsetIconHeight, isOnboarding, src } = this.props;
 
     const iconProps = unsetIconHeight ? {} : { height: 42, width: 42 };
 
-    iconProps.src = './images/logo/metamask-fox.svg';
-
     let renderHorizontalLogo = () => (
-      <MetaFoxHorizontalLogo
-        theme={theme}
+      <img
+        src="./images/logo/extension-logo.png"
+        height={40}
+        style={{ width: 'auto' }}
         className={classnames({
           'app-header__metafox-logo--horizontal': !isOnboarding,
           'onboarding-app-header__metafox-logo--horizontal': isOnboarding,
         })}
+        alt="AIR Wallet"
       />
     );
 
-    let imageSrc = './images/logo/metamask-fox.svg';
+    let imageSrc = './images/airwallet-icon.png';
 
     if (src) {
       renderHorizontalLogo = () => (

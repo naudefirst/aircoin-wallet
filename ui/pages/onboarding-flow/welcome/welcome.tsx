@@ -126,8 +126,7 @@ export default function OnboardingWelcome() {
   );
 
   // In test environments or when returning from another page, skip animations
-  const [isAnimationComplete, setIsAnimationComplete] =
-    useState(shouldSkipAnimation);
+  const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 
   const isFireFox = getBrowserName() === PLATFORM_FIREFOX;
 
@@ -541,28 +540,12 @@ export default function OnboardingWelcome() {
       className="welcome-container h-full w-full"
     >
       {!isLoggingIn && (
-        <Suspense fallback={<Box />}>
-          <MetaMaskWordMarkAnimation
-            setIsAnimationComplete={setIsAnimationComplete}
-            isAnimationComplete={isAnimationComplete}
-            skipTransition={shouldSkipAnimation}
-          />
-        </Suspense>
-      )}
-
-      {!isLoggingIn && (
         <>
           <WelcomeLogin
             onLogin={handleLogin}
             isAnimationComplete={isAnimationComplete}
             skipTransition={shouldSkipAnimation}
           />
-
-          {isAnimationComplete && (
-            <Suspense fallback={<Box />}>
-              <FoxAppearAnimation skipTransition={shouldSkipAnimation} />
-            </Suspense>
-          )}
 
           {loginError !== null && (
             <LoginErrorModal
@@ -574,9 +557,11 @@ export default function OnboardingWelcome() {
       )}
 
       {isLoggingIn && (
-        <Suspense fallback={<Box />}>
-          <FoxAppearAnimation isLoader />
-        </Suspense>
+        <img
+          src="./images/spinner.gif"
+          alt=""
+          style={{ width: 48, height: 48, margin: 'auto' }}
+        />
       )}
     </Box>
   );

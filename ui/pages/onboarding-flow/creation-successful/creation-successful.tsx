@@ -429,7 +429,13 @@ export default function CreationSuccessful() {
               {t('yourWalletIsReadyFromReminder')}
             </Text>
             <Box className="w-full mb-6">
-              <Box className="w-36 h-36 mx-auto">{renderFox}</Box>
+              <Box className="w-36 h-36 mx-auto flex items-center justify-center">
+                <img
+                  src="./images/logo/extension-logo.png"
+                  alt="AIR Wallet"
+                  style={{ width: '100%', height: 'auto' }}
+                />
+              </Box>
             </Box>
             <Text
               variant={TextVariant.BodyMd}
@@ -462,17 +468,6 @@ export default function CreationSuccessful() {
         <Text className="title">{t('yourWalletIsReady')}</Text>
       )}
       {renderDoneButton()}
-      {!isFromSettingsSRPBackup && (
-        <Box>
-          <TextButton
-            onClick={() => navigate(ONBOARDING_PRIVACY_SETTINGS_ROUTE)}
-            className="hover:bg-transparent active:bg-transparent w-full text-center"
-            data-testid="manage-default-settings"
-          >
-            {t('manageDefaultSettings')}
-          </TextButton>
-        </Box>
-      )}
     </Box>
   );
 }
